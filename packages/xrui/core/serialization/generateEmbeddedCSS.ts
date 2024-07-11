@@ -45,10 +45,12 @@ export async function generateEmbeddedCSS(url: string, css: string): Promise<str
   css = css.replaceAll(':focus', WebRenderer.attributeCSS(WebRenderer.FOCUS_ATTRIBUTE))
   css = css.replaceAll(':target', WebRenderer.attributeCSS(WebRenderer.TARGET_ATTRIBUTE))
 
-  while ((found = CSS_URL_REGEX.exec(css))) {
-    const isCSSImport = !!found[2]
+  const matches = css.matchAll(CSS_URL_REGEX)
+
+  for (const match of matches) {
+    const isCSSImport = !!match[2]
     const accept = isCSSImport ? 'type/css' : undefined
-    const resourceURL = found[2] || found[3]
+    const resourceURL = match[2] || match[3]
     promises.push(
       getEmbeddedDataURL(new URL(resourceURL, url).href, accept).then((dataURL) => {
         css = css.replace(resourceURL, dataURL)

@@ -26,12 +26,14 @@ import assert from 'assert'
 import {
   ABSOLUTE_URL_PROTOCOL_REGEX,
   ASSETS_REGEX,
+  BUILDER_CHART_REGEX,
   CSS_URL_REGEX,
   EMAIL_REGEX,
   GITHUB_URL_REGEX,
   INSTALLATION_SIGNED_REGEX,
   INVALID_FILENAME_REGEX,
   INVITE_CODE_REGEX,
+  MAIN_CHART_REGEX,
   PHONE_REGEX,
   PROJECT_PUBLIC_REGEX,
   PROJECT_REGEX,
@@ -61,7 +63,6 @@ describe('regex.test', () => {
       ]
       invalidFilenames.forEach((filename) => {
         assert.ok(INVALID_FILENAME_REGEX.test(filename), `Expected '${filename}' to be invalid`)
-        INVALID_FILENAME_REGEX.lastIndex = 0
       })
     })
 
@@ -80,7 +81,6 @@ describe('regex.test', () => {
       ]
       validFilenames.forEach((filename) => {
         assert.ok(!INVALID_FILENAME_REGEX.test(filename), `Expected '${filename}' to be valid`)
-        INVALID_FILENAME_REGEX.lastIndex = 0
       })
     })
   })
@@ -159,10 +159,18 @@ describe('regex.test', () => {
       ]
 
       positiveCases.forEach(({ source, urlResource }) => {
-        const match = CSS_URL_REGEX.exec(source)
-        assert.ok(match, `Expected '${source}' to match CSS_URL_REGEX`)
-        assert.equal(match?.[2] ?? match?.[3], urlResource, `Expected URL resource: ${urlResource} in '${source}'`)
-        CSS_URL_REGEX.lastIndex = 0 // reset the regex (important for patterns with global flag)
+        const matches = source.matchAll(CSS_URL_REGEX)
+
+        const matchesArray = Array.from(matches)
+        assert.ok(matchesArray.length > 0, `Expected '${source}' to match CSS_URL_REGEX`)
+
+        for (const match of matchesArray) {
+          assert.equal(
+            match[2] ?? match[3],
+            urlResource,
+            `Expected URL resource: ${urlResource} in '${source}'. Found ${match[2] ?? match[3]}`
+          )
+        }
       })
     })
 
@@ -175,7 +183,9 @@ describe('regex.test', () => {
       ]
 
       negativeCases.forEach((source) => {
-        assert.ok(!CSS_URL_REGEX.test(source), `Expected '${source}' to not match CSS_URL_REGEX`)
+        const matches = source.matchAll(CSS_URL_REGEX)
+        const matchesArray = Array.from(matches)
+        assert.ok(matchesArray.length === 0, `Expected '${source}' to not match CSS_URL_REGEX`)
       })
     })
   })
@@ -659,6 +669,114 @@ describe('regex.test', () => {
       ]
       negativeCases.forEach((name) => {
         assert.doesNotMatch(name, VALID_PROJECT_NAME, `Expected '${name}' to not match VALID_PROJECT_NAME`)
+      })
+    })
+  })
+
+  describe('MAIN_CHART_REGEX', () => {
+    it('should match valid charts', () => {
+      const positiveCases = [
+        {
+          chart: 'etherealengine-1.0.0',
+          version: '1.0.0'
+        },
+        {
+          chart: 'etherealengine-10.11.12',
+          version: '10.11.12'
+        },
+        {
+          chart: 'etherealengine-123.456.789',
+          version: '123.456.789'
+        },
+        {
+          chart: 'etherealengine-0.0.1',
+          version: '0.0.1'
+        },
+        {
+          chart: 'etherealengine-9.99.999',
+          version: '9.99.999'
+        }
+      ]
+
+      positiveCases.forEach(({ chart, version }) => {
+        const matches = chart.matchAll(MAIN_CHART_REGEX)
+        const matchesArray = Array.from(matches)
+        assert.ok(matchesArray.length > 0, `Expected '${chart}' to match MAIN_CHART_REGEX`)
+
+        for (const match of matchesArray) {
+          assert.equal(match[1], version, `Expected version: ${version} in '${chart}'. Found ${match[1]}`)
+        }
+      })
+    })
+
+    it('should not match invalid charts', () => {
+      const negativeCases = [
+        'etherealengine-1.0', // only two groups of digits
+        'etherealengine-1.0.a', // non-digit character in version
+        'etherealengine-1.0_0', // underscore instead of period
+        'etheralengine-1.0.0', // misspelled prefix
+        'etherealengine 1.0.0', // space instead of hyphen
+        'etherealengine-.0.0', // missing first group of digits
+        '1.0.0-etherealengine' // version string not in the correct place
+      ]
+      negativeCases.forEach((chart) => {
+        const matches = chart.matchAll(MAIN_CHART_REGEX)
+        const matchesArray = Array.from(matches)
+        assert.ok(matchesArray.length === 0, `Expected '${chart}' to not match MAIN_CHART_REGEX`)
+      })
+    })
+  })
+
+  describe('BUILDER_CHART_REGEX', () => {
+    it('should match valid charts', () => {
+      const positiveCases = [
+        {
+          chart: 'etherealengine-builder-1.0.0',
+          version: '1.0.0'
+        },
+        {
+          chart: 'etherealengine-builder-10.11.12',
+          version: '10.11.12'
+        },
+        {
+          chart: 'etherealengine-builder-123.456.789',
+          version: '123.456.789'
+        },
+        {
+          chart: 'etherealengine-builder-0.0.1',
+          version: '0.0.1'
+        },
+        {
+          chart: 'etherealengine-builder-9.99.999',
+          version: '9.99.999'
+        }
+      ]
+
+      positiveCases.forEach(({ chart, version }) => {
+        const matches = chart.matchAll(BUILDER_CHART_REGEX)
+        const matchesArray = Array.from(matches)
+        assert.ok(matchesArray.length > 0, `Expected '${chart}' to match BUILDER_CHART_REGEX`)
+
+        for (const match of matchesArray) {
+          assert.equal(match[1], version, `Expected version: ${version} in '${chart}'. Found ${match[1]}`)
+        }
+      })
+    })
+
+    it('should not match invalid charts', () => {
+      const negativeCases = [
+        'etherealengine-builder-1.0', // only two groups of digits
+        'etherealengine-builder-1.0.a', // non-digit character in version
+        'etherealengine-builder-1.0_0', // underscore instead of period
+        'etheralengine-1.0.0', // misspelled prefix
+        'etherealengine-builder 1.0.0', // space instead of hyphen
+        'etherealengine-builder-.0.0', // missing first group of digits
+        '1.0.0-etherealengine-builder' // version string not in the correct place
+      ]
+      negativeCases.forEach((chart) => {
+        const matches = chart.matchAll(BUILDER_CHART_REGEX)
+        const matchesArray = Array.from(matches)
+        assert.ok(matchesArray.length === 0, `Expected '${chart}' to not match BUILDER_CHART_REGEX`)
       })
     })
   })

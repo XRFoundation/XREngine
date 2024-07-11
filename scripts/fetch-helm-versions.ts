@@ -32,11 +32,8 @@ import knex from 'knex'
 import path from 'path'
 import { promisify } from 'util'
 
-import { helmSettingPath, HelmSettingType } from '@etherealengine/common/src/schema.type.module'
-import {
-  BUILDER_CHART_REGEX,
-  MAIN_CHART_REGEX
-} from '@etherealengine/server-core/src/setting/helm-setting/helm-setting'
+import { BUILDER_CHART_REGEX, MAIN_CHART_REGEX } from '@etherealengine/common/src/regex'
+import { HelmSettingType, helmSettingPath } from '@etherealengine/common/src/schema.type.module'
 
 dotenv.config({
   path: appRootPath.path,
@@ -74,22 +71,44 @@ cli.main(async () => {
       if (helmSettings.main && helmSettings.main.length > 0) fs.writeFileSync(helmMainVersionName, helmSettings.main)
       else {
         const { stdout } = await execAsync(`helm history ${options.stage} | grep deployed`)
-        const mainChartVersion = MAIN_CHART_REGEX.exec(stdout)
-        if (mainChartVersion) fs.writeFileSync(helmMainVersionName, mainChartVersion[1])
+        const matches = stdout.matchAll(MAIN_CHART_REGEX)
+        for (const match of matches) {
+          const mainChartVersion = match[1]
+          if (mainChartVersion) {
+            fs.writeFileSync(helmMainVersionName, mainChartVersion)
+          }
+        }
       }
       if (helmSettings.builder && helmSettings.builder.length > 0)
         fs.writeFileSync(helmBuilderVersionName, helmSettings.builder)
       else {
         const { stdout } = await execAsync(`helm history ${options.stage}-builder | grep deployed`)
-        const builderChartVersion = BUILDER_CHART_REGEX.exec(stdout)
-        if (builderChartVersion) fs.writeFileSync(helmBuilderVersionName, builderChartVersion[1])
+        const matches = stdout.matchAll(BUILDER_CHART_REGEX)
+        for (const match of matches) {
+          const builderChartVersion = match[1]
+          if (builderChartVersion) {
+            fs.writeFileSync(helmBuilderVersionName, builderChartVersion)
+          }
+        }
       }
     } else {
       const { stdout } = await execAsync(`helm history ${options.stage} | grep deployed`)
-      const mainChartVersion = MAIN_CHART_REGEX.exec(stdout)
-      if (mainChartVersion) fs.writeFileSync(helmMainVersionName, mainChartVersion[1])
-      const builderChartVersion = BUILDER_CHART_REGEX.exec(stdout)
-      if (builderChartVersion) fs.writeFileSync(helmBuilderVersionName, builderChartVersion[1])
+
+      const mainChartMatches = stdout.matchAll(MAIN_CHART_REGEX)
+      for (const match of mainChartMatches) {
+        const mainChartVersion = match[1]
+        if (mainChartVersion) {
+          fs.writeFileSync(helmMainVersionName, mainChartVersion)
+        }
+      }
+
+      const builderChartMatches = stdout.matchAll(MAIN_CHART_REGEX)
+      for (const match of builderChartMatches) {
+        const builderChartVersion = match[1]
+        if (builderChartVersion) {
+          fs.writeFileSync(helmBuilderVersionName, builderChartVersion)
+        }
+      }
     }
     cli.exit(0)
   } catch (err) {

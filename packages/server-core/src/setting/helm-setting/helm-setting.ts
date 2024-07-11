@@ -39,8 +39,7 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-export const MAIN_CHART_REGEX = /etherealengine-([0-9]+.[0-9]+.[0-9]+)/g
-export const BUILDER_CHART_REGEX = /etherealengine-builder-([0-9]+.[0-9]+.[0-9]+)/g
+import { BUILDER_CHART_REGEX, MAIN_CHART_REGEX } from '@etherealengine/common/src/regex'
 
 declare module '@etherealengine/common/declarations' {
   interface ServiceTypes {
@@ -79,13 +78,12 @@ export default (app: Application): void => {
       const response = await fetch('https://helm.etherealengine.org')
       const chart = Buffer.from(await response.arrayBuffer()).toString()
 
-      let ended = false
-      while (!ended) {
-        const match = MAIN_CHART_REGEX.exec(chart)
+      const matches = chart.matchAll(MAIN_CHART_REGEX)
+      for (const match of matches) {
         if (match) {
           //Need 5.1.3 or greater for API servers to have required cluster roles to run helm upgrade
           if (versions.indexOf(match[1]) < 0 && semver.gte(match[1], '5.1.3')) versions.push(match[1])
-        } else ended = true
+        }
       }
       return versions
     }
@@ -97,12 +95,12 @@ export default (app: Application): void => {
       const response = await fetch('https://helm.etherealengine.org')
       const chart = Buffer.from(await response.arrayBuffer()).toString()
 
-      let ended = false
-      while (!ended) {
-        const match = BUILDER_CHART_REGEX.exec(chart)
-        if (match) {
-          if (versions.indexOf(match[1]) < 0) versions.push(match[1])
-        } else ended = true
+      const matches = chart.matchAll(BUILDER_CHART_REGEX)
+
+      for (const match of matches) {
+        if (match && versions.indexOf(match[1]) < 0) {
+          versions.push(match[1])
+        }
       }
       return versions
     }

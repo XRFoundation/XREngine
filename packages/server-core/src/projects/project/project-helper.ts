@@ -75,6 +75,7 @@ import { AssetLoader } from '@etherealengine/engine/src/assets/classes/AssetLoad
 import { getState } from '@etherealengine/hyperflux'
 import { ProjectConfigInterface, ProjectEventHooks } from '@etherealengine/projects/ProjectConfigInterface'
 
+import { BUILDER_CHART_REGEX } from '@etherealengine/common/src/regex'
 import { Application } from '../../../declarations'
 import config from '../../appconfig'
 import { getPodsData } from '../../cluster/pods/pods-helper'
@@ -85,7 +86,6 @@ import { getFileKeysRecursive } from '../../media/storageprovider/storageProvide
 import { createStaticResourceHash } from '../../media/upload-asset/upload-asset.service'
 import logger from '../../ServerLogger'
 import { ServerState } from '../../ServerState'
-import { BUILDER_CHART_REGEX } from '../../setting/helm-setting/helm-setting'
 import { getContentType } from '../../util/fileUtils'
 import { getGitConfigData, getGitHeadData, getGitOrigHeadData } from '../../util/getGitData'
 import { useGit } from '../../util/gitHelperFunctions'
@@ -195,11 +195,16 @@ export const updateBuilder = async (
         )
       else {
         const { stdout } = await execAsync(`helm history ${builderDeploymentName} | grep deployed`)
-        const builderChartVersion = BUILDER_CHART_REGEX.exec(stdout)![1]
-        if (builderChartVersion)
-          await execAsync(
-            `helm repo update && helm upgrade --reuse-values --version ${builderChartVersion} --set builder.image.tag=${tag} ${builderDeploymentName} etherealengine/etherealengine-builder`
-          )
+
+        const matches = stdout.matchAll(BUILDER_CHART_REGEX)
+
+        for (const match of matches) {
+          const builderChartVersion = match[1]
+          if (builderChartVersion)
+            await execAsync(
+              `helm repo update && helm upgrade --reuse-values --version ${builderChartVersion} --set builder.image.tag=${tag} ${builderDeploymentName} etherealengine/etherealengine-builder`
+            )
+        }
       }
     } catch (err) {
       logger.error(err)
