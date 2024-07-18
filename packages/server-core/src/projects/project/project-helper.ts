@@ -1678,16 +1678,22 @@ export const uploadLocalProjectToProvider = async (
   // remove exiting storage provider files
   logger.info(`uploadLocalProjectToProvider for project "${projectName}" started at "${new Date()}".`)
   if (remove) {
+    console.log('Deleting project files from storageProvider')
     await deleteProjectFilesInStorageProvider(app, projectName)
+    console.log('deleted project files from storageProvider')
   }
 
   const manifest = getProjectManifest(projectName)
   const oldManifestScenes = (manifest as any)?.scenes as Array<string> | undefined
 
+  console.log('oldManifestScenes', oldManifestScenes)
   // remove scenes from manifest
   if (oldManifestScenes) {
+    console.log('deleting manifest scenes')
     delete (manifest as any).scenes
+    console.log('deleted manifest scenes')
     fs.writeFileSync(path.join(projectsRootFolder, projectName, 'manifest.json'), JSON.stringify(manifest, null, 2))
+    console.log('wrote new manifest file')
   }
 
   // upload new files to storage provider
@@ -1699,6 +1705,7 @@ export const uploadLocalProjectToProvider = async (
   )
 
   const results = [] as (string | null)[]
+  console.log('getting existing project resources')
   const existingResources = await app.service(staticResourcePath).find({
     query: {
       project: projectName
@@ -1706,13 +1713,16 @@ export const uploadLocalProjectToProvider = async (
     paginate: false
   })
 
+  console.log('existing resources', existingResources)
   const existingKeySet = new Map<string, string>()
   for (const item of existingResources) {
     existingKeySet.set(item.key, item.id)
   }
 
+  console.log('migrating resources.json')
   // migrate resources.json if needed
   migrateResourcesJson(projectName, resourcesJsonPath)
+  console.log('finished migrating resources.json')
 
   const resourcesJson = fs.existsSync(resourcesJsonPath)
     ? (JSON.parse(fs.readFileSync(resourcesJsonPath).toString()) as ResourcesJson)
@@ -1726,6 +1736,7 @@ export const uploadLocalProjectToProvider = async (
 
   for (const file of filteredFilesInProjectFolder) {
     try {
+      console.log('uploading file', file)
       const fileResult = fs.readFileSync(file)
       const filePathRelative = processFileName(file.slice(projectRootPath.length + 1))
       const key = `projects/${projectName}/${filePathRelative}`
@@ -1739,6 +1750,7 @@ export const uploadLocalProjectToProvider = async (
         },
         { isDirectory: false }
       )
+      console.log('put file', file, 'in storageProvider')
       if (!filePathRelative.startsWith(`assets/`) && !filePathRelative.startsWith(`public/`)) {
         existingKeySet.delete(key)
         continue
@@ -1757,6 +1769,7 @@ export const uploadLocalProjectToProvider = async (
         const id = existingKeySet.get(key)!
         existingKeySet.delete(key)
         // logger.info(`Updating static resource of class ${thisFileClass}: "${key}"`)
+        console.log('patching existing resource record', id, file)
         await app.service(staticResourcePath).patch(
           id,
           {
@@ -1774,7 +1787,9 @@ export const uploadLocalProjectToProvider = async (
           },
           { ignoreResourcesJson: true }
         )
+        console.log('patched existing resource record', id, file)
       } else {
+        console.log('creating new resource record', file)
         // logger.info(`Creating static resource of class ${thisFileClass}: "${key}"`)
         await app.service(staticResourcePath).create(
           {
@@ -1796,6 +1811,7 @@ export const uploadLocalProjectToProvider = async (
         )
         logger.info(`Uploaded static resource of class ${thisFileClass}: "${key}"`)
       }
+      console.log('Created new static reosurce record', file)
 
       results.push(storageProvider.getCachedURL(key, true))
     } catch (e) {
@@ -1804,6 +1820,7 @@ export const uploadLocalProjectToProvider = async (
     }
   }
 
+  console.log('uploaded all static resources')
   await Promise.all(
     Array.from(existingKeySet.values()).map(async (id) => {
       try {
@@ -1813,6 +1830,7 @@ export const uploadLocalProjectToProvider = async (
       }
     })
   )
+  console.log('removed all existing keys')
   await regenerateProjectResourcesJson(app, projectName)
   logger.info(`uploadLocalProjectToProvider for project "${projectName}" ended at "${new Date()}".`)
   const assetsOnly = !fs.existsSync(path.join(projectRootPath, 'xrengine.config.ts'))
