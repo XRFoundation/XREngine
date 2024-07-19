@@ -1595,7 +1595,9 @@ export const deleteProjectFilesInStorageProvider = async (
 ) => {
   console.log('deletProjectFilesInStorageProvider', projectName)
   const storageProvider = getStorageProvider(storageProviderName)
+  console.log('storageProvider', storageProvider)
   try {
+    console.log('calling getFileKeysRecursive')
     const existingFiles = await getFileKeysRecursive(`projects/${projectName}`)
     console.log('existingFiles')
     if (existingFiles.length) {
