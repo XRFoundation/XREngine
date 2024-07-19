@@ -314,13 +314,16 @@ export class S3Provider implements StorageProviderInterface {
    * @returns {Promise<StorageListObjectInterface>}
    */
   async listObjects(prefix: string, recursive = true, continuationToken?: string): Promise<StorageListObjectInterface> {
+    console.log('s3 listObjects', prefix, recursive, continuationToken)
     const command = new ListObjectsV2Command({
       Bucket: this.bucket,
       ContinuationToken: continuationToken,
       Prefix: prefix,
       Delimiter: recursive ? undefined : '/'
     })
+    console.log('command', command)
     const response = await this.provider.send(command)
+    console.log('response', response)
     if (!response.Contents) response.Contents = []
     if (!response.CommonPrefixes) response.CommonPrefixes = []
 
