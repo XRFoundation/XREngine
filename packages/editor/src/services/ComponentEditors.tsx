@@ -114,6 +114,7 @@ import RenderSettingsEditor from '@etherealengine/ui/src/components/editor/prope
 import RigidBodyComponentEditor from '@etherealengine/ui/src/components/editor/properties/rigidBody'
 import ScenePreviewCameraNodeEditor from '@etherealengine/ui/src/components/editor/properties/scene/previewCamera'
 import SceneSettingsEditor from '@etherealengine/ui/src/components/editor/properties/scene/settings'
+import SceneDynamicLoadTagEditor from '@etherealengine/ui/src/components/editor/properties/sceneDynamicLoadTag'
 import ScreenshareTargetNodeEditor from '@etherealengine/ui/src/components/editor/properties/screenShareTarget'
 import SDFEditor from '@etherealengine/ui/src/components/editor/properties/sdf'
 import ShadowNodeEditor from '@etherealengine/ui/src/components/editor/properties/shadow'
@@ -121,6 +122,7 @@ import SkyboxNodeEditor from '@etherealengine/ui/src/components/editor/propertie
 import SpawnPointNodeEditor from '@etherealengine/ui/src/components/editor/properties/spawnPoint'
 import SplineNodeEditor from '@etherealengine/ui/src/components/editor/properties/spline'
 
+import { SceneDynamicLoadTagComponent } from '@etherealengine/engine/src/scene/components/SceneDynamicLoadTagComponent'
 import InputComponentNodeEditor from '@etherealengine/ui/src/components/editor/properties/input'
 import PlaylistNodeEditor from '@etherealengine/ui/src/components/editor/properties/playlist'
 import SplineTrackNodeEditor from '@etherealengine/ui/src/components/editor/properties/spline/track'
@@ -187,7 +189,8 @@ export const ComponentEditorsState = defineState({
       [ScreenshareTargetComponent.name]: ScreenshareTargetNodeEditor,
       [TextComponent.name]: TextNodeEditor,
       [LookAtComponent.name]: LookAtNodeEditor,
-      [ReflectionProbeComponent.name]: ReflectionProbeNodeEditor
+      [ReflectionProbeComponent.name]: ReflectionProbeNodeEditor,
+      [SceneDynamicLoadTagComponent.name]: SceneDynamicLoadTagEditor
     } as Record<string, EditorComponentType>
   }
 })

@@ -241,6 +241,13 @@
       "description": "A rigidbody component that allows the entity to be affected by physics.",
       "lbl-type": "Body Type"
     },
+    "sceneDynamicLoadTag": {
+      "name": "Scene Dynamic Load Tag",
+      "description": "A Scene Dynamic Load Tag component",
+      "lbl-mode":"Mode",
+      "lbl-distance":"Distance",
+      "lbl-loaded":"Loaded"
+    },
     "prefab": {
       "name": "Prefab",
       "description": "A grouping of scene components which can be dynamically loaded and unloaded",
