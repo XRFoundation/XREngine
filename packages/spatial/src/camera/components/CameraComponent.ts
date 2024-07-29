@@ -25,8 +25,10 @@ Ethereal Engine. All Rights Reserved.
 
 import { ArrayCamera, PerspectiveCamera } from 'three'
 
-import { defineComponent } from '@etherealengine/ecs/src/ComponentFunctions'
+import { defineComponent, useComponent } from '@etherealengine/ecs/src/ComponentFunctions'
 
+import { useEntityContext } from '@etherealengine/ecs'
+import { useEffect } from 'react'
 import { addObjectToGroup, removeObjectFromGroup } from '../../renderer/components/GroupComponent'
 
 export const CameraComponent = defineComponent({
@@ -42,15 +44,11 @@ export const CameraComponent = defineComponent({
     return camera
   },
   onSet: (entity, component, json) => {
-    addObjectToGroup(entity, component.value as ArrayCamera)
     if (!json) return
     if (typeof json.fov === 'number') component.fov.set(json.fov)
     if (typeof json.aspect === 'number') component.fov.set(json.aspect)
     if (typeof json.near === 'number') component.fov.set(json.near)
     if (typeof json.far === 'number') component.fov.set(json.far)
-  },
-  onRemove: (entity, component) => {
-    removeObjectFromGroup(entity, component.value as ArrayCamera)
   },
   toJSON: (entity, component) => {
     return {
@@ -59,5 +57,17 @@ export const CameraComponent = defineComponent({
       near: component.near.value,
       far: component.far.value
     }
+  },
+  reactor: () => {
+    const entity = useEntityContext()
+    const component = useComponent(entity, CameraComponent)
+    useEffect(() => {
+      addObjectToGroup(entity, component.value as ArrayCamera)
+      return () => {
+        removeObjectFromGroup(entity, component.value as ArrayCamera)
+      }
+    }, [])
+
+    return null
   }
 })
