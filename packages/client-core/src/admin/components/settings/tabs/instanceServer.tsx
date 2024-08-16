@@ -186,7 +186,7 @@ const InstanceServerTab = forwardRef(({ open }: { open: boolean }, ref: React.Mu
           {t('admin:components.setting.webRTCSettings.main')}
         </Text>
 
-        { settings.webRTCSettings.useCustomICEServers.value && settings.webRTCSettings.iceServers.value.map(iceServer => {
+        { settings.webRTCSettings.useCustomICEServers.value && settings.webRTCSettings.iceServers.map(iceServer => {
           return <>
             {
               <>
@@ -196,7 +196,7 @@ const InstanceServerTab = forwardRef(({ open }: { open: boolean }, ref: React.Mu
                     size="small"
                     fullWidth
                     onClick={() => {
-                      if (typeof iceServer.urls === 'string') iceServer.urls.set([iceServer.urls, ''])
+                      if (typeof iceServer.urls.value === 'string') iceServer.urls.set([iceServer.urls.value, ''])
                       else iceServer.urls.set(iceServer.urls.value.push(''))
                     }}
                 />

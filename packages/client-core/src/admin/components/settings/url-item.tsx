@@ -4,15 +4,15 @@ import React from "react";
 import { useTranslation } from 'react-i18next'
 import { HiTrash } from 'react-icons/hi2'
 
-const { t } = useTranslation()
-
 export const URLItem = ({
     iceServer
 }) => {
-    return typeof iceServer.urls === 'string' ? <> <Input
+    const { t } = useTranslation()
+
+    return typeof iceServer.urls.value === 'string' ? <> <Input
         className="col-span-1"
         label={t('admin:components.setting.webRTCSettings.iceURL')}
-        value={iceServer.urls}
+        value={iceServer.urls.value}
         onChange={(e) => {
             iceServer.urls.set(e.target.value)
         }}
@@ -27,12 +27,12 @@ export const URLItem = ({
         }}
     />
         </> :
-        iceServer.urls.map((url, index) => {
+        iceServer.urls?.map((url, index) => {
         return <>
             <Input
                 className="col-span-1"
                 label={t('admin:components.setting.webRTCSettings.iceURL')}
-                value={url}
+                value={url.value}
                 onChange={(e) => {
                     iceServer.urls[index].set(e.target.value)
                 }}
