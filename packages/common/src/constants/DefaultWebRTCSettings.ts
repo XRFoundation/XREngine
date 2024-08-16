@@ -30,7 +30,5 @@ export const HASH_ALGORITHM = 'sha1'
 export const defaultWebRTCSettings = {
   iceServers: [],
   useCustomICEServers: false,
-  useTimeLimitedCredentials: false,
-  webRTCStaticAuthSecretKey: '',
   usePrivateInstanceserverIP: false
 }

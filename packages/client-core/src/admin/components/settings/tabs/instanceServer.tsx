@@ -39,6 +39,8 @@ import Input from '@etherealengine/ui/src/primitives/tailwind/Input'
 import LoadingView from '@etherealengine/ui/src/primitives/tailwind/LoadingView'
 import Text from '@etherealengine/ui/src/primitives/tailwind/Text'
 import Toggle from '@etherealengine/ui/src/primitives/tailwind/Toggle'
+import { HiPlus } from 'react-icons/hi2'
+import { URLItem } from "../url-item";
 
 const InstanceServerTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableRefObject<HTMLDivElement>) => {
   const { t } = useTranslation()
@@ -54,12 +56,10 @@ const InstanceServerTab = forwardRef(({ open }: { open: boolean }, ref: React.Mu
   const local = useHookstate(true)
 
   const settingsState = useHookstate(null as null | InstanceServerSettingType)
-  const stringifiedIceServers = useHookstate('')
 
   useEffect(() => {
     if (instanceServerSettings) {
       settingsState.set(instanceServerSettings)
-      stringifiedIceServers.set(JSON.stringify(instanceServerSettings.webRTCSettings.iceServers))
       state.set({ loading: false, errorMessage: '' })
     }
   }, [instanceServerSettings])
@@ -72,12 +72,6 @@ const InstanceServerTab = forwardRef(({ open }: { open: boolean }, ref: React.Mu
       createdAt: undefined!,
       updatedAt: undefined!
     } as any as InstanceServerSettingType
-    try {
-      if (stringifiedIceServers.value.length === 0) stringifiedIceServers.set('[]')
-      newSettings.webRTCSettings.iceServers = JSON.parse(stringifiedIceServers.value)
-    } catch (err) {
-      //
-    }
 
     Engine.instance.api
       .service(instanceServerSettingPath)
@@ -192,36 +186,82 @@ const InstanceServerTab = forwardRef(({ open }: { open: boolean }, ref: React.Mu
           {t('admin:components.setting.webRTCSettings.main')}
         </Text>
 
-        <Input
-          className="col-span-1"
-          label={t('admin:components.setting.webRTCSettings.iceServers')}
-          value={stringifiedIceServers.value || '[]'}
-          onChange={(e) => {
-            stringifiedIceServers.set(e.target.value)
-          }}
-        />
+        { settings.webRTCSettings.useCustomICEServers.value && settings.webRTCSettings.iceServers.value.map(iceServer => {
+          return <>
+            {
+              <>
+                <URLItem iceServer={iceServer} />
+                <Button
+                    startIcon={<HiPlus />}
+                    size="small"
+                    fullWidth
+                    onClick={() => {
+                      if (typeof iceServer.urls === 'string') iceServer.urls.set([iceServer.urls, ''])
+                      else iceServer.urls.set(iceServer.urls.value.push(''))
+                    }}
+                />
+                </>
+            }
 
-        <PasswordInput
-          className="col-span-1"
-          label={t('admin:components.setting.webRTCSettings.webRTCStaticAuthSecretKey')}
-          value={settings.webRTCSettings.webRTCStaticAuthSecretKey.value || ''}
-          onChange={(e) => {
-            settings.webRTCSettings.webRTCStaticAuthSecretKey.set(e.target.value)
-          }}
-        />
+            <Checkbox
+                className="col-span-1"
+                label={t('admin:components.setting.webRTCSettings.useFixedCredentials')}
+                value={iceServer.useFixedCredentials.value || false}
+                onChange={(value) => iceServer.useFixedCredentials.set(value)}
+            />
+
+          {
+            iceServer.useFixedCredentials.value && (
+                <>
+                <Input
+                    className="col-span-1"
+                    label={t('admin:components.setting.webRTCSettings.username')}
+                    value={iceServer.username.value || ''}
+                    onChange={(e) => {
+                      iceServer.username.set(e.target.value)
+                    }}
+                />
+
+                  <Input
+                      className="col-span-1"
+                      label={t('admin:components.setting.webRTCSettings.credential')}
+                      value={iceServer.credential.value || ''}
+                      onChange={(e) => {
+                        iceServer.credential.set(e.target.value)
+                      }}
+                  />
+                </>
+            )
+          }
+
+            <Checkbox
+                className="col-span-1"
+                label={t('admin:components.setting.webRTCSettings.useTimeLimitedCredentials')}
+                value={settings.webRTCSettings.useTimeLimitedCredentials.value || false}
+                onChange={(value) => settings.webRTCSettings.useTimeLimitedCredentials.set(value)}
+            />
+
+          {
+            iceServer.useTimeLimitedCredentials.value && (
+                <PasswordInput
+                    className="col-span-1"
+                    label={t('admin:components.setting.webRTCSettings.webRTCStaticAuthSecretKey')}
+                    value={iceServer.webRTCStaticAuthSecretKey.value || ''}
+                    onChange={(e) => {
+                      iceServer.webRTCStaticAuthSecretKey.set(e.target.value)
+                    }}
+                />
+            )
+          }
+          </>
+          })
+        }
 
         <Checkbox
           className="col-span-1"
           label={t('admin:components.setting.webRTCSettings.useCustomICEServers')}
           value={settings.webRTCSettings.useCustomICEServers.value || false}
           onChange={(value) => settings.webRTCSettings.useCustomICEServers.set(value)}
-        />
-
-        <Checkbox
-          className="col-span-1"
-          label={t('admin:components.setting.webRTCSettings.useTimeLimitedCredentials')}
-          value={settings.webRTCSettings.useTimeLimitedCredentials.value || false}
-          onChange={(value) => settings.webRTCSettings.useTimeLimitedCredentials.set(value)}
         />
 
         <Checkbox
