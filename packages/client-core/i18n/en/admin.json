@@ -528,7 +528,8 @@
       "webRTCSettings": {
         "main": "WebRTC Settings",
         "useCustomICEServers": "Use custom iceServers configuration",
-        "iceServers": "iceServers (STUN/TURN configuration; must provide proper JSON)",
+        "iceServers": "iceServers (STUN/TURN configuration)",
+        "iceServer": "iceServer #",
         "useTimeLimitedCredentials": "Use time-limited credentials to authenticate STUN/TURN server",
         "webRTCStaticAuthSecretKey": "Shared static-auth-secret for authenticating STUN/TURN server",
         "usePrivateInstanceserverIP": "Return instanceservers' raw private IP address instead of DNS record"

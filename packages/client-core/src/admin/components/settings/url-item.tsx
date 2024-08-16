@@ -3,13 +3,14 @@ import Button from "@etherealengine/ui/src/primitives/tailwind/Button";
 import React from "react";
 import { useTranslation } from 'react-i18next'
 import { HiTrash } from 'react-icons/hi2'
+import { v4 as uuidv4 } from 'uuid'
 
 export const URLItem = ({
     iceServer
 }) => {
     const { t } = useTranslation()
 
-    return typeof iceServer.urls.value === 'string' ? <> <Input
+    return typeof iceServer.urls.value === 'string' ? <div className="col-span-1 flex flex-row items-center"> <Input
         className="col-span-1"
         label={t('admin:components.setting.webRTCSettings.iceURL')}
         value={iceServer.urls.value}
@@ -21,16 +22,15 @@ export const URLItem = ({
         startIcon={<HiTrash />}
         variant="danger"
         size="small"
-        fullWidth
+        style={{ margin: '20px 0 0 5px' }}
         onClick={() => {
             iceServer.urls.set([])
         }}
     />
-        </> :
+        </div> :
         iceServer.urls?.map((url, index) => {
-        return <>
+        return <div className="col-span-1 flex flex-row items-center" key={uuidv4()}>
             <Input
-                className="col-span-1"
                 label={t('admin:components.setting.webRTCSettings.iceURL')}
                 value={url.value}
                 onChange={(e) => {
@@ -41,13 +41,13 @@ export const URLItem = ({
                 startIcon={<HiTrash />}
                 variant="danger"
                 size="small"
-                fullWidth
+                style={{ margin: '20px 0 0 5px' }}
                 onClick={() => {
-                    const urls = iceServer.urls.value
+                    const urls = [...new Set(iceServer.urls.value)]
                     urls.splice(index, 1)
                     iceServer.urls.set(urls)
                 }}
             />
-        </>
+        </div>
     })
 }

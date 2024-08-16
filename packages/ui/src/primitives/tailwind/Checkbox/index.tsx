@@ -27,6 +27,7 @@ import React from 'react'
 import { HiCheck } from 'react-icons/hi'
 
 import { twMerge } from 'tailwind-merge'
+import { v4 as uuidv4 } from 'uuid'
 
 import Label from '../Label'
 
@@ -46,12 +47,15 @@ const Checkbox = ({ className, containerClassName, label, value, onChange, disab
     }
   }
 
+  const id = uuidv4()
+
   return (
     <div className={twMerge('relative flex cursor-pointer items-end', containerClassName)}>
       <input
         type="checkbox"
         checked={value}
         onChange={handleChange}
+        id={id}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
             handleChange()
@@ -67,9 +71,8 @@ const Checkbox = ({ className, containerClassName, label, value, onChange, disab
       />
       <HiCheck onClick={handleChange} className="absolute m-0.5 hidden h-3 w-3 text-white peer-checked:block" />
 
-      {label && <Label className="ml-2 cursor-pointer self-stretch leading-[1.15]">{label}</Label>}
+      {label && <Label className="ml-2 cursor-pointer self-stretch leading-[1.15]" htmlFor={id}>{label}</Label>}
     </div>
   )
 }
-
 export default Checkbox
