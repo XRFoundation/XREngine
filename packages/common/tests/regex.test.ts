@@ -351,7 +351,6 @@ describe('regex.test', () => {
         'username@yahoo.com.',
         'username@yahoo..com',
         'username@yahoo.c',
-        'username@yahoo.corporate',
         'username@-example.com',
         'username@example.com-',
         'username@example..com',
