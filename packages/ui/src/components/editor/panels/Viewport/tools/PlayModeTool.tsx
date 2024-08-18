@@ -23,24 +23,9 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import { AuthState } from '@etherealengine/client-core/src/user/services/AuthService'
-import { UUIDComponent } from '@etherealengine/ecs'
-import { getComponent, removeComponent } from '@etherealengine/ecs/src/ComponentFunctions'
-import { Engine } from '@etherealengine/ecs/src/Engine'
-import { removeEntity } from '@etherealengine/ecs/src/EntityFunctions'
-import { TransformGizmoControlledComponent } from '@etherealengine/editor/src/classes/TransformGizmoControlledComponent'
-import { EditorState } from '@etherealengine/editor/src/services/EditorServices'
-import { transformGizmoControlledQuery } from '@etherealengine/editor/src/systems/GizmoSystem'
-import { VisualScriptActions, visualScriptQuery } from '@etherealengine/engine'
-import { AvatarComponent } from '@etherealengine/engine/src/avatar/components/AvatarComponent'
-import { getRandomSpawnPoint } from '@etherealengine/engine/src/avatar/functions/getSpawnPoint'
-import { spawnLocalAvatarInWorld } from '@etherealengine/engine/src/avatar/functions/receiveJoinWorld'
-import { dispatchAction, getMutableState, getState, useHookstate } from '@etherealengine/hyperflux'
-import { WorldNetworkAction } from '@etherealengine/network'
+import { getMutableState, useHookstate } from '@etherealengine/hyperflux'
 import { EngineState } from '@etherealengine/spatial/src/EngineState'
-import { FollowCameraComponent } from '@etherealengine/spatial/src/camera/components/FollowCameraComponent'
-import { TargetCameraRotationComponent } from '@etherealengine/spatial/src/camera/components/TargetCameraRotationComponent'
-import { ComputedTransformComponent } from '@etherealengine/spatial/src/transform/components/ComputedTransformComponent'
+import { startPlayMode, tryStopPlayMode } from '@etherealengine/spatial/src/common/functions/PlayModeFunctions'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { HiOutlinePause, HiOutlinePlay } from 'react-icons/hi2'
@@ -51,39 +36,10 @@ const PlayModeTool = () => {
   const { t } = useTranslation()
 
   const isEditing = useHookstate(getMutableState(EngineState).isEditing)
-  const authState = useHookstate(getMutableState(AuthState))
 
   const onTogglePlayMode = () => {
-    const entity = AvatarComponent.getSelfAvatarEntity()
-    if (entity) {
-      dispatchAction(WorldNetworkAction.destroyEntity({ entityUUID: getComponent(entity, UUIDComponent) }))
-      removeEntity(entity)
-      removeComponent(Engine.instance.cameraEntity, ComputedTransformComponent)
-      removeComponent(Engine.instance.cameraEntity, FollowCameraComponent)
-      removeComponent(Engine.instance.cameraEntity, TargetCameraRotationComponent)
-      getMutableState(EngineState).isEditing.set(true)
-      visualScriptQuery().forEach((entity) => dispatchAction(VisualScriptActions.stop({ entity })))
-      // stop all visual script logic
-    } else {
-      const avatarDetails = authState.user.avatar.value
-
-      const avatarSpawnPose = getRandomSpawnPoint(Engine.instance.userID)
-      const currentScene = getComponent(getState(EditorState).rootEntity, UUIDComponent)
-
-      if (avatarDetails)
-        spawnLocalAvatarInWorld({
-          parentUUID: currentScene,
-          avatarSpawnPose,
-          avatarID: avatarDetails.id!,
-          name: authState.user.name.value
-        })
-
-      // todo
-      getMutableState(EngineState).isEditing.set(false)
-      // run all visual script logic
-      visualScriptQuery().forEach((entity) => dispatchAction(VisualScriptActions.execute({ entity })))
-      transformGizmoControlledQuery().forEach((entity) => removeComponent(entity, TransformGizmoControlledComponent))
-      //just remove all gizmo in the scene
+    if (!tryStopPlayMode()) {
+      startPlayMode()
     }
   }
 

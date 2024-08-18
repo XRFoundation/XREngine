@@ -38,6 +38,7 @@ import { GLTFSourceState } from '@etherealengine/engine/src/gltf/GLTFState'
 import { handleScenePaths } from '@etherealengine/engine/src/scene/functions/GLTFConversion'
 import { getMutableState, getState } from '@etherealengine/hyperflux'
 import { EngineState } from '@etherealengine/spatial/src/EngineState'
+import { tryStopPlayMode } from '@etherealengine/spatial/src/common/functions/PlayModeFunctions'
 import { SceneComponent } from '@etherealengine/spatial/src/renderer/components/SceneComponents'
 import { Params } from '@feathersjs/feathers'
 import { EditorState } from '../services/EditorServices'
@@ -190,6 +191,7 @@ export const onNewScene = async (
 }
 
 export const setCurrentEditorScene = (sceneURL: string, uuid: EntityUUID) => {
+  tryStopPlayMode()
   const gltfEntity = GLTFSourceState.load(sceneURL, uuid, getState(EngineState).originEntity)
   setComponent(gltfEntity, SceneComponent)
   getMutableState(EditorState).rootEntity.set(gltfEntity)
