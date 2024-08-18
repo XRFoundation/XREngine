@@ -29,11 +29,14 @@ import { disallow } from 'feathers-hooks-common'
 import { sign } from 'jsonwebtoken'
 
 const getZendeskToken = (context: HookContext<Application>) => {
+  const { email } = context.params.user.identityProviders.find((ip) => ip.email)
+
   context.result = sign(
     {
       scope: 'user',
       external_id: context.params.user.id,
-      name: context.params.user.name
+      name: context.params.user.name,
+      email
     },
     appConfig.zendesk.secret!,
     {
