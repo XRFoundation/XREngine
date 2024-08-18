@@ -24,6 +24,10 @@ Ethereal Engine. All Rights Reserved.
 */
 
 export const cleanURL = (url: string) => {
-  const newURL = new URL(url)
-  return newURL.origin + newURL.pathname
+  try {
+    const newURL = new URL(url)
+    return newURL.origin + newURL.pathname
+  } catch {
+    return url
+  }
 }

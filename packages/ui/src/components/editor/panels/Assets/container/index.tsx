@@ -177,9 +177,8 @@ const ResourceFile = (props: {
   }
 
   const assetType = AssetLoader.getAssetType(resource.key)
-  const splitResourceKey = resource.key.split('/')
-  const name = splitResourceKey.at(-1)!
-  const path = splitResourceKey.slice(0, -1).join('/') + '/'
+  const name = resource.name
+  const path = resource.key.split('/').slice(0, -1).join('/') + '/'
 
   const [_, drag, preview] = useDrag(() => ({
     type: assetType,
@@ -504,7 +503,7 @@ const AssetPanel = () => {
         : []
 
       const query = {
-        key: {
+        name: {
           $like: `%${searchText.value}%`
         },
         type: {

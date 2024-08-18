@@ -42,6 +42,7 @@ export const staticResourceSchema = Type.Object(
       format: 'uuid'
     }),
     key: Type.String(),
+    name: Type.String(),
     mimeType: Type.String(),
     userId: TypedString<UserID>({
       format: 'uuid'
@@ -81,6 +82,7 @@ export const staticResourceDataSchema = Type.Partial(
   Type.Pick(staticResourceSchema, [
     'id',
     'key',
+    'name',
     'mimeType',
     'userId',
     'hash',
@@ -104,6 +106,7 @@ export const staticResourcePatchSchema = Type.Partial(
   Type.Pick(staticResourceSchema, [
     'id',
     'key',
+    'name',
     'mimeType',
     'userId',
     'hash',
@@ -128,6 +131,7 @@ export interface StaticResourcePatch extends Static<typeof staticResourcePatchSc
 export const staticResourceQueryProperties = Type.Pick(staticResourceSchema, [
   'id',
   'key',
+  'name',
   'mimeType',
   'userId',
   'hash',
@@ -148,6 +152,9 @@ export const staticResourceQuerySchema = Type.Intersect(
   [
     querySyntax(staticResourceQueryProperties, {
       key: {
+        $like: Type.String()
+      },
+      name: {
         $like: Type.String()
       },
       mimeType: {

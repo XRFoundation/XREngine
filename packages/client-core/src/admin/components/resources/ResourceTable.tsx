@@ -65,6 +65,7 @@ export default function ResourceTable({ search }: { search: string }) {
   const createData = (el: StaticResourceType) => {
     return {
       id: el.id,
+      name: el.name,
       key: el.key,
       mimeType: el.mimeType,
       project: el.project,

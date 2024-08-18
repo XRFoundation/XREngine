@@ -27,7 +27,7 @@ import { t } from 'i18next'
 
 import { ITableHeadCell } from '../Table'
 
-type IdType = 'id' | 'key' | 'mimeType' | 'project' | 'action'
+type IdType = 'id' | 'name' | 'key' | 'mimeType' | 'project' | 'action'
 
 export type ResourceRowType = Record<IdType, string | JSX.Element | undefined>
 
@@ -37,6 +37,7 @@ interface IResourceColumn extends ITableHeadCell {
 
 export const resourceColumns: IResourceColumn[] = [
   { id: 'id', label: t('admin:components.resources.columns.id') },
+  { id: 'name', sortable: true, label: t('admin:components.resources.columns.name') },
   { id: 'key', sortable: true, label: t('admin:components.resources.columns.key') },
   { id: 'mimeType', sortable: true, label: t('admin:components.resources.columns.mimeType') },
   { id: 'project', sortable: true, label: t('admin:components.resources.columns.project') },

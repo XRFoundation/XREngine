@@ -27,7 +27,7 @@ import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { PopoverState } from '@etherealengine/client-core/src/common/services/PopoverState'
-import { StaticResourceType, uploadAssetPath } from '@etherealengine/common/src/schema.type.module'
+import { staticResourcePath, StaticResourceType, uploadAssetPath } from '@etherealengine/common/src/schema.type.module'
 import { cleanURL } from '@etherealengine/common/src/utils/cleanURL'
 import { AssetsPreviewPanel } from '@etherealengine/editor/src/components/assets/AssetsPreviewPanel'
 import {
@@ -41,6 +41,7 @@ import Input from '@etherealengine/ui/src/primitives/tailwind/Input'
 import Modal from '@etherealengine/ui/src/primitives/tailwind/Modal'
 import Radio from '@etherealengine/ui/src/primitives/tailwind/Radio'
 
+import { useMutation } from '@etherealengine/spatial/src/common/functions/FeathersHooks'
 import { NotificationService } from '../../../common/services/NotificationService'
 import { uploadToFeathersService } from '../../../util/upload'
 
@@ -55,7 +56,6 @@ const getNameAndType = async (url: string) => {
     const assetType = ExtensionToAssetType[extension!]
     const mimeType = AssetTypeToMimeType[assetType]
     return {
-      name: fileName,
       mimeType: mimeType,
       assetType: assetType
     }
@@ -80,10 +80,11 @@ export default function CreateResourceModal({ selectedResource }: { selectedReso
 
   const modalProcessing = useHookstate(false)
   const errors = useHookstate(getDefaultErrors())
+  const staticResourcesMutation = useMutation(staticResourcePath)
 
   const state = useHookstate({
     id: selectedResource?.id ? selectedResource.id : '',
-    name: selectedResource?.key ? selectedResource.key : '',
+    name: selectedResource?.name ? selectedResource.name : '',
     mimeType: selectedResource?.mimeType ? selectedResource.mimeType : '',
     project: selectedResource?.project ? selectedResource.project : '',
     source: 'url' as 'url' | 'file',
@@ -112,11 +113,10 @@ export default function CreateResourceModal({ selectedResource }: { selectedReso
       })
     } else {
       const url = cleanURL(state.resourceURL.value)
-      getNameAndType(url).then(({ name, mimeType, assetType }) => {
-        state.name.set(name)
+      getNameAndType(url).then(({ mimeType, assetType }) => {
         state.mimeType.set(mimeType)
         ;(previewPanelRef as any).current?.onSelectionChanged({
-          name: name,
+          name: state.name.value,
           resourceUrl: url,
           contentType: assetType
         })
@@ -156,6 +156,9 @@ export default function CreateResourceModal({ selectedResource }: { selectedReso
           type: 'admin-file-upload',
           args: { path: state.name.value, project: state.project.value }
         })
+      }
+      if (selectedResource?.name && selectedResource?.name !== state.name.value) {
+        staticResourcesMutation.patch(selectedResource!.id!, { name: state.name.value })
       }
       PopoverState.hidePopupover()
     } catch (e) {
