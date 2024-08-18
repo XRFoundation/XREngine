@@ -28,6 +28,7 @@ import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { locationPath, LocationType } from '@etherealengine/common/src/schema.type.module'
+import { Engine } from '@etherealengine/ecs/src/Engine'
 import Button from '@etherealengine/ui/src/primitives/mui/Button'
 import Icon from '@etherealengine/ui/src/primitives/mui/Icon'
 import InputAdornment from '@etherealengine/ui/src/primitives/mui/InputAdornment'
@@ -40,7 +41,6 @@ import TableRow from '@etherealengine/ui/src/primitives/mui/TableRow'
 import TextField from '@etherealengine/ui/src/primitives/mui/TextField'
 import Typography from '@etherealengine/ui/src/primitives/mui/Typography'
 
-import { API } from '../../../../API'
 import { LocationSeed } from '../../../../social/services/LocationService'
 import styles from '../index.module.scss'
 
@@ -68,7 +68,7 @@ const LocationMenu = (props: Props) => {
   }, [])
 
   const fetchLocations = (page: number, rows: number, search?: string) => {
-    API.instance.client
+    Engine.instance.api
       .service(locationPath)
       .find({
         query: {

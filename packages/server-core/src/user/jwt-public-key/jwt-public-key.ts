@@ -23,33 +23,29 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import authentication from '@feathersjs/authentication-client'
-import feathers from '@feathersjs/client'
-import Primus from 'primus-client'
+// Initializes the `login` service on path `/login`
 
-import config from '@etherealengine/common/src/config'
-import { Engine } from '@etherealengine/ecs/src/Engine'
+import { jwtPublicKeyMethods, jwtPublicKeyPath } from '@etherealengine/common/src/schemas/user/jwt-public-key.schema'
+import { Application } from '../../../declarations'
+import { JWTPublicKeyService } from './jwt-public-key.class'
+import jwtPublicKeyDocs from './jwt-public-key.docs'
+import hooks from './jwt-public-key.hooks'
 
-import primusClient from './util/primus-client'
-
-/**@deprecated - use 'Engine.instance.api' instead */
-export class API {
-  static createAPI = () => {
-    const feathersClient = feathers()
-
-    const primus = new Primus(`${config.client.serverUrl}?pathName=${window.location.pathname}`, {
-      withCredentials: true
-    })
-    feathersClient.configure(primusClient(primus, { timeout: 10000 }))
-
-    feathersClient.configure(
-      authentication({
-        storageKey: config.client.featherStoreKey
-      })
-    )
-
-    primus.on('reconnected', () => feathersClient.reAuthenticate(true))
-
-    Engine.instance.api = feathersClient
+declare module '@etherealengine/common/declarations' {
+  interface ServiceTypes {
+    [jwtPublicKeyPath]: JWTPublicKeyService
   }
+}
+
+export default (app: Application): void => {
+  app.use(jwtPublicKeyPath, new JWTPublicKeyService(app), {
+    // A list of all methods this service exposes externally
+    methods: jwtPublicKeyMethods,
+    // You can add additional custom events to be sent to clients here
+    events: [],
+    docs: jwtPublicKeyDocs
+  })
+
+  const service = app.service(jwtPublicKeyPath)
+  service.hooks(hooks)
 }

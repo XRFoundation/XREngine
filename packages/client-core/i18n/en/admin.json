@@ -367,6 +367,8 @@
       "service": "Service",
       "githubAppId": "App ID (Enter for GitHub App, omit for OAuth App)",
       "secret": "Secret",
+      "jwtAlgorithm": "JWT Algorithm",
+      "jwtPublicKey": "JWT Public Key",
       "entity": "Entity",
       "authStrategies": "Authentication Strategies",
       "userName": "User Name",

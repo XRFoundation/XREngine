@@ -30,12 +30,12 @@ import { createRoot } from 'react-dom/client'
 
 import { ChannelID, MessageID, UserID } from '@etherealengine/common/src/schema.type.module'
 import { createEngine } from '@etherealengine/ecs'
+import { Engine } from '@etherealengine/ecs/src/Engine'
 import { getMutableState } from '@etherealengine/hyperflux'
 
 import { InstanceChat } from '.'
 import { createDOM } from '../../../tests/createDOM'
 import { createMockAPI } from '../../../tests/createMockAPI'
-import { API } from '../../API'
 import { ChannelState } from '../../social/services/ChannelService'
 
 describe('Instance Chat Component', () => {
@@ -46,7 +46,7 @@ describe('Instance Chat Component', () => {
     rootContainer = document.createElement('div')
     document.body.appendChild(rootContainer)
     createEngine()
-    API.instance = createMockAPI()
+    Engine.instance.api = createMockAPI()
   })
 
   afterEach(() => {

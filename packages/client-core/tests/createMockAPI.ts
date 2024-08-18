@@ -23,7 +23,7 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import { API } from '../src/API'
+import type { FeathersClient } from '@etherealengine/ecs/src/Engine'
 
 type MockFeathers = {
   on: (type: string, cb: () => void) => void
@@ -42,23 +42,21 @@ type ServicesToMock = {
 
 export const createMockAPI = (servicesToMock?: ServicesToMock) => {
   return {
-    client: {
-      service: (service: string) => {
-        if (servicesToMock && servicesToMock[service]) {
-          return servicesToMock[service]
-        } else {
-          return {
-            on: (type, cb) => {},
-            off: (type, cb) => {},
-            find: (type) => {},
-            get: (type) => {},
-            create: (type) => {},
-            patch: (type) => {},
-            update: (type) => {},
-            remove: (type) => {}
-          }
+    service: (service: string) => {
+      if (servicesToMock && servicesToMock[service]) {
+        return servicesToMock[service]
+      } else {
+        return {
+          on: (type, cb) => {},
+          off: (type, cb) => {},
+          find: (type) => {},
+          get: (type) => {},
+          create: (type) => {},
+          patch: (type) => {},
+          update: (type) => {},
+          remove: (type) => {}
         }
       }
     }
-  } as unknown as API
+  } as FeathersClient
 }

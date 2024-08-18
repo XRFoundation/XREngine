@@ -23,9 +23,7 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import { Engine } from '@etherealengine/ecs/src/Engine'
-
-import { FeathersClient } from '../API'
+import { Engine, FeathersClient } from '@etherealengine/ecs/src/Engine'
 
 async function waitForClientAuthenticated(): Promise<void> {
   const api = Engine.instance.api as FeathersClient

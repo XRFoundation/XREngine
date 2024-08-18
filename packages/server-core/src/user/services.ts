@@ -32,6 +32,7 @@ import GithubRepoAccessRefresh from './github-repo-access-refresh/github-repo-ac
 import GithubRepoAccessWebhook from './github-repo-access-webhook/github-repo-access-webhook'
 import GithubRepoAccess from './github-repo-access/github-repo-access'
 import IdentityProvider from './identity-provider/identity-provider'
+import JwtPublicKey from './jwt-public-key/jwt-public-key'
 import LoginToken from './login-token/login-token'
 import Login from './login/login'
 import MagicLink from './magic-link/magic-link'
@@ -66,5 +67,6 @@ export default [
   GithubRepoAccess,
   GithubRepoAccessRefresh,
   GithubRepoAccessWebhook,
-  GenerateToken
+  GenerateToken,
+  JwtPublicKey
 ]

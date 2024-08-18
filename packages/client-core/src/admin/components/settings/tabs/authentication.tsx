@@ -200,6 +200,20 @@ const AuthenticationTab = forwardRef(({ open }: { open: boolean }, ref: React.Mu
 
         <Input
           className="col-span-1"
+          label={t('admin:components.setting.entity')}
+          value={authSetting?.entity || ''}
+          disabled
+        />
+
+        <Input
+          className="col-span-1"
+          label={t('admin:components.setting.jwtAlgorithm')}
+          value={authSetting?.jwtAlgorithm || ''}
+          disabled
+        />
+
+        <PasswordInput
+          className="col-span-1"
           label={t('admin:components.setting.secret')}
           value={authSetting?.secret || ''}
           disabled
@@ -207,8 +221,8 @@ const AuthenticationTab = forwardRef(({ open }: { open: boolean }, ref: React.Mu
 
         <Input
           className="col-span-1"
-          label={t('admin:components.setting.entity')}
-          value={authSetting?.entity || ''}
+          label={t('admin:components.setting.jwtPublicKey')}
+          value={authSetting?.jwtPublicKey || ''}
           disabled
         />
       </div>

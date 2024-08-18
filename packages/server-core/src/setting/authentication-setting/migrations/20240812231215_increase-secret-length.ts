@@ -23,33 +23,22 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import authentication from '@feathersjs/authentication-client'
-import feathers from '@feathersjs/client'
-import Primus from 'primus-client'
+import type { Knex } from 'knex'
 
-import config from '@etherealengine/common/src/config'
-import { Engine } from '@etherealengine/ecs/src/Engine'
+import { authenticationSettingPath } from '@etherealengine/common/src/schemas/setting/authentication-setting.schema'
 
-import primusClient from './util/primus-client'
-
-/**@deprecated - use 'Engine.instance.api' instead */
-export class API {
-  static createAPI = () => {
-    const feathersClient = feathers()
-
-    const primus = new Primus(`${config.client.serverUrl}?pathName=${window.location.pathname}`, {
-      withCredentials: true
-    })
-    feathersClient.configure(primusClient(primus, { timeout: 10000 }))
-
-    feathersClient.configure(
-      authentication({
-        storageKey: config.client.featherStoreKey
-      })
-    )
-
-    primus.on('reconnected', () => feathersClient.reAuthenticate(true))
-
-    Engine.instance.api = feathersClient
-  }
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+export async function up(knex: Knex): Promise<void> {
+  await knex.schema.alterTable(authenticationSettingPath, async (table) => {
+    table.string('secret', 4095).nullable().alter()
+  })
 }
+
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+export async function down(knex: Knex): Promise<void> {}

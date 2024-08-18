@@ -23,9 +23,11 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
+import type { AuthenticationClient } from '@feathersjs/authentication-client'
 import type { FeathersApplication } from '@feathersjs/feathers'
 import * as bitECS from 'bitecs'
 import { getAllEntities } from 'bitecs'
+import Primus from 'primus-client'
 import { Cache } from 'three'
 
 import type { ServiceTypes } from '@etherealengine/common/declarations'
@@ -40,10 +42,16 @@ import { removeEntity } from './EntityFunctions'
 import { removeQuery } from './QueryFunctions'
 import { SystemState } from './SystemState'
 
+export type FeathersClient = FeathersApplication<ServiceTypes> &
+  AuthenticationClient & {
+    primus: Primus
+    authentication: AuthenticationClient
+  }
+
 export class Engine {
   static instance: Engine
 
-  api: FeathersApplication<ServiceTypes>
+  api: FeathersApplication<ServiceTypes> | FeathersClient
 
   /** The uuid of the logged-in user */
   userID: UserID

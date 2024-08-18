@@ -57,6 +57,7 @@ import {
   userPath,
   userSettingPath
 } from '@etherealengine/common/src/schema.type.module'
+import type { FeathersClient } from '@etherealengine/ecs/src/Engine'
 import { Engine } from '@etherealengine/ecs/src/Engine'
 import {
   defineState,
@@ -65,7 +66,6 @@ import {
   syncStateWithLocalStorage,
   useHookstate
 } from '@etherealengine/hyperflux'
-import { API } from '../../API'
 import { NotificationService } from '../../common/services/NotificationService'
 
 export const logger = multiLogger.child({ component: 'client-core:AuthService' })
@@ -170,7 +170,7 @@ export interface LinkedInLoginForm {
  */
 async function _resetToGuestToken(options = { reset: true }) {
   if (options.reset) {
-    await API.instance.client.authentication.reset()
+    await (Engine.instance.api as FeathersClient).authentication.reset()
   }
   const newProvider = await Engine.instance.api.service(identityProviderPath).create({
     type: 'guest',
@@ -179,7 +179,7 @@ async function _resetToGuestToken(options = { reset: true }) {
   })
   const accessToken = newProvider.accessToken!
   console.log(`Created new guest accessToken: ${accessToken}`)
-  await API.instance.client.authentication.setAccessToken(accessToken as string)
+  await (Engine.instance.api as FeathersClient).authentication.setAccessToken(accessToken as string)
   return accessToken
 }
 
@@ -195,22 +195,26 @@ export const AuthService = {
       const accessToken = !forceClientAuthReset && authState?.authUser?.accessToken?.value
 
       if (forceClientAuthReset) {
-        await API.instance.client.authentication.reset()
+        await (Engine.instance.api as FeathersClient).authentication.reset()
       }
       if (accessToken) {
-        await API.instance.client.authentication.setAccessToken(accessToken as string)
+        await (Engine.instance.api as FeathersClient).authentication.setAccessToken(accessToken as string)
       } else {
         await _resetToGuestToken({ reset: false })
       }
 
       let res: AuthenticationResult
       try {
-        res = await API.instance.client.reAuthenticate()
+        res = await (Engine.instance.api as FeathersClient).reAuthenticate()
       } catch (err) {
-        if (err.className === 'not-found' || (err.className === 'not-authenticated' && err.message === 'jwt expired')) {
+        if (
+          err.className === 'not-found' ||
+          (err.className === 'not-authenticated' && err.message === 'jwt expired') ||
+          (err.className === 'not-authenticated' && err.message === 'invalid algorithm')
+        ) {
           authState.merge({ isLoggedIn: false, user: UserSeed, authUser: AuthUserSeed })
           await _resetToGuestToken()
-          res = await API.instance.client.reAuthenticate()
+          res = await (Engine.instance.api as FeathersClient).reAuthenticate()
         } else {
           logger.error(err, 'Error re-authenticating')
           throw err
@@ -222,7 +226,7 @@ export const AuthService = {
         if (!identityProvider?.id) {
           authState.merge({ isLoggedIn: false, user: UserSeed, authUser: AuthUserSeed })
           await _resetToGuestToken()
-          res = await API.instance.client.reAuthenticate()
+          res = await (Engine.instance.api as FeathersClient).reAuthenticate()
         }
         const authUser = resolveAuthUser(res)
         // authUser is now { accessToken, authentication, identityProvider }
@@ -243,15 +247,14 @@ export const AuthService = {
 
   async loadUserData(userId: UserID) {
     try {
-      const client = API.instance.client
-      const user = await client.service(userPath).get(userId)
+      const user = await Engine.instance.api.service(userPath).get(userId)
       if (!user.userSetting) {
-        const settingsRes = (await client
+        const settingsRes = (await Engine.instance.api
           .service(userSettingPath)
           .find({ query: { userId: userId } })) as Paginated<UserSettingType>
 
         if (settingsRes.total === 0) {
-          user.userSetting = await client.service(userSettingPath).create({ userId: userId })
+          user.userSetting = await Engine.instance.api.service(userSettingPath).create({ userId: userId })
         } else {
           user.userSetting = settingsRes.data[0]
         }
@@ -278,7 +281,7 @@ export const AuthService = {
     authState.merge({ isProcessing: true, error: '' })
 
     try {
-      const authenticationResult = await API.instance.client.authenticate({
+      const authenticationResult = await (Engine.instance.api as FeathersClient).authenticate({
         strategy: 'local',
         email: form.email,
         password: form.password
@@ -392,8 +395,8 @@ export const AuthService = {
 
         if (newTokenResult?.token) {
           getMutableState(AuthState).merge({ isProcessing: true, error: '' })
-          await API.instance.client.authentication.setAccessToken(newTokenResult.token)
-          const res = await API.instance.client.reAuthenticate(true)
+          await (Engine.instance.api as FeathersClient).authentication.setAccessToken(newTokenResult.token)
+          const res = await (Engine.instance.api as FeathersClient).reAuthenticate(true)
           const authUser = resolveAuthUser(res)
           await Engine.instance.api.service(identityProviderPath).remove(ipToRemove.id)
           const authState = getMutableState(AuthState)
@@ -409,8 +412,8 @@ export const AuthService = {
     const authState = getMutableState(AuthState)
     authState.merge({ isProcessing: true, error: '' })
     try {
-      await API.instance.client.authentication.setAccessToken(accessToken as string)
-      const res = await API.instance.client.authenticate({
+      await (Engine.instance.api as FeathersClient).authentication.setAccessToken(accessToken as string)
+      const res = await (Engine.instance.api as FeathersClient).authenticate({
         strategy: 'jwt',
         accessToken
       })
@@ -459,7 +462,7 @@ export const AuthService = {
     const authState = getMutableState(AuthState)
     authState.merge({ isProcessing: true, error: '' })
     try {
-      await API.instance.client.logout()
+      await (Engine.instance.api as FeathersClient).logout()
       authState.merge({ isLoggedIn: false, user: UserSeed, authUser: AuthUserSeed })
     } catch (_) {
       authState.merge({ isLoggedIn: false, user: UserSeed, authUser: AuthUserSeed })

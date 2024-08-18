@@ -16,7 +16,9 @@
   "dependencies": {
     "@etherealengine/common": "^1.6.0",
     "@etherealengine/hyperflux": "^1.6.0",
+    "@feathersjs/authentication-client": "5.0.5",
     "bitecs": "0.3.40",
+    "primus-client": "^7.3.4",
     "three": "0.158.0",
     "uuid": "9.0.0"
   },

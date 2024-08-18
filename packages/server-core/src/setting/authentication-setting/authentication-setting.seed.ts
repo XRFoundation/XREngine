@@ -51,6 +51,8 @@ export async function seed(knex: Knex): Promise<void> {
         service: identityProviderPath,
         entity: identityProviderPath,
         secret: process.env.AUTH_SECRET || 'test',
+        jwtAlgorithm: process.env.JWT_ALGORITHM,
+        jwtPublicKey: process.env.JWT_PUBLIC_KEY,
         authStrategies: JSON.stringify([
           { jwt: true },
           { smsMagicLink: true },
@@ -65,6 +67,7 @@ export async function seed(knex: Knex): Promise<void> {
           { didWallet: true }
         ]),
         jwtOptions: JSON.stringify({
+          algorithm: process.env.JWT_ALGORITHM || 'HS256',
           expiresIn: '30 days'
         }),
         bearerToken: JSON.stringify({

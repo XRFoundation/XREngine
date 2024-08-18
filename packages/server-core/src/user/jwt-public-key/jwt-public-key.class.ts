@@ -23,33 +23,27 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import authentication from '@feathersjs/authentication-client'
-import feathers from '@feathersjs/client'
-import Primus from 'primus-client'
+import { Params, ServiceInterface } from '@feathersjs/feathers'
+import { Application } from '../../../declarations'
+import appconfig from '../../appconfig'
 
-import config from '@etherealengine/common/src/config'
-import { Engine } from '@etherealengine/ecs/src/Engine'
+/**
+ * A class for Login service
+ */
+export class JWTPublicKeyService implements ServiceInterface {
+  app: Application
 
-import primusClient from './util/primus-client'
+  constructor(app: Application) {
+    this.app = app
+  }
 
-/**@deprecated - use 'Engine.instance.api' instead */
-export class API {
-  static createAPI = () => {
-    const feathersClient = feathers()
-
-    const primus = new Primus(`${config.client.serverUrl}?pathName=${window.location.pathname}`, {
-      withCredentials: true
-    })
-    feathersClient.configure(primusClient(primus, { timeout: 10000 }))
-
-    feathersClient.configure(
-      authentication({
-        storageKey: config.client.featherStoreKey
-      })
-    )
-
-    primus.on('reconnected', () => feathersClient.reAuthenticate(true))
-
-    Engine.instance.api = feathersClient
+  /**
+   * A function which find specific login details
+   *
+   * @param params
+   * @returns {token}
+   */
+  async find(params?: Params) {
+    return appconfig.authentication.jwtPublicKey
   }
 }

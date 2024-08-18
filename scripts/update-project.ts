@@ -34,7 +34,7 @@ import { createFeathersKoaApp, serverJobPipe } from '@etherealengine/server-core
 import { updateAppConfig } from '@etherealengine/server-core/src/updateAppConfig'
 import { NotAuthenticated } from '@feathersjs/errors'
 import { Octokit } from '@octokit/rest'
-import { JwtPayload, decode } from 'jsonwebtoken'
+import { JwtPayload, verify } from 'jsonwebtoken'
 
 dotenv.config({
   path: appRootPath.path,
@@ -82,7 +82,7 @@ cli.main(async () => {
     if (data.token) {
       const appId = config.authentication.oauth.github.appId ? parseInt(config.authentication.oauth.github.appId) : null
       const token = data.token
-      const jwtDecoded = decode(token)! as JwtPayload
+      const jwtDecoded = verify(token, config.authentication.secret, { algorithms: ['RS256'] })! as JwtPayload
       if (jwtDecoded.iss == null || parseInt(jwtDecoded.iss) !== appId)
         throw new NotAuthenticated('Invalid app credentials')
       const octoKit = new Octokit({ auth: token })

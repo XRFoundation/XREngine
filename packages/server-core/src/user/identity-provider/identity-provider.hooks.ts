@@ -170,7 +170,7 @@ async function validateAuthParams(context: HookContext<IdentityProviderService>)
         { accessToken: context.params.authentication.accessToken },
         {}
       )
-      if (userId !== authResult[appConfig.authentication.entity]?.userId)
+      if (userId?.length > 0 && userId !== authResult[appConfig.authentication.entity]?.userId)
         throw new BadRequest('Cannot make identity-providers on other users')
     } else {
       if (userId && existingUser)

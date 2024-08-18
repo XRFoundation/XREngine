@@ -37,7 +37,6 @@ import { Engine } from '@etherealengine/ecs/src/Engine'
 import { defineState, getMutableState, getState } from '@etherealengine/hyperflux'
 
 import { useEffect } from 'react'
-import { API } from '../../API'
 import { NotificationService } from '../../common/services/NotificationService'
 import { AuthState } from '../../user/services/AuthService'
 
@@ -141,7 +140,7 @@ export const LocationService = {
   getLocation: async (locationId: LocationID) => {
     try {
       LocationState.fetchingCurrentSocialLocation()
-      const location = await API.instance.client.service(locationPath).get(locationId)
+      const location = await Engine.instance.api.service(locationPath).get(locationId)
       LocationState.socialLocationRetrieved(location)
     } catch (err) {
       NotificationService.dispatchNotify(err.message, { variant: 'error' })
@@ -149,7 +148,7 @@ export const LocationService = {
   },
   getLocationByName: async (locationName: string) => {
     LocationState.fetchingCurrentSocialLocation()
-    const locationResult = (await API.instance.client.service(locationPath).find({
+    const locationResult = (await Engine.instance.api.service(locationPath).find({
       query: {
         slugifiedName: locationName
       }
@@ -167,7 +166,7 @@ export const LocationService = {
     }
   },
   getLobby: async () => {
-    const lobbyResult = (await API.instance.client.service(locationPath).find({
+    const lobbyResult = (await Engine.instance.api.service(locationPath).find({
       query: {
         isLobby: true,
         $limit: 1
@@ -182,7 +181,7 @@ export const LocationService = {
   },
   banUserFromLocation: async (userId: UserID, locationId: LocationID) => {
     try {
-      await API.instance.client.service(locationBanPath).create({
+      await Engine.instance.api.service(locationBanPath).create({
         userId: userId,
         locationId: locationId
       })

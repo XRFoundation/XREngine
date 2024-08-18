@@ -27,7 +27,7 @@ import { Paginated } from '@feathersjs/feathers/lib'
 
 import '@feathersjs/transport-commons'
 
-import { decode } from 'jsonwebtoken'
+import { verify } from 'jsonwebtoken'
 
 import {
   channelPath,
@@ -73,6 +73,7 @@ import getLocalServerIp from '@etherealengine/server-core/src/util/get-local-ser
 import './InstanceServerModule'
 
 import { initializeSpatialEngine } from '@etherealengine/spatial/src/initializeEngine'
+import { NotAuthenticated } from '@feathersjs/errors'
 import { InstanceServerState } from './InstanceServerState'
 import { authorizeUserToJoinServer, handleDisconnect, setupIPs } from './NetworkFunctions'
 import { restartInstanceServer } from './restartInstanceServer'
@@ -597,10 +598,15 @@ export const onConnection = (app: Application) => async (connection: PrimusConne
 
   if (!connection.socketQuery?.token) return
 
-  const authResult = await app.service('authentication').strategies.jwt.authenticate!(
-    { accessToken: connection.socketQuery.token },
-    {}
-  )
+  let authResult
+  try {
+    authResult = await app.service('authentication').strategies.jwt.authenticate!(
+      { accessToken: connection.socketQuery.token },
+      {}
+    )
+  } catch (err) {
+    return new NotAuthenticated(err)
+  }
   const identityProvider = authResult[identityProviderPath] as IdentityProviderType
   if (!identityProvider?.id) return
 
@@ -727,7 +733,8 @@ const onDisconnection = (app: Application) => async (connection: PrimusConnectio
     authResult = await app.service('authentication').strategies.jwt.authenticate!({ accessToken: token }, {})
   } catch (err) {
     if (err.code === 401 && err.data.name === 'TokenExpiredError') {
-      const jwtDecoded = decode(token)!
+      const algorithms = process.env.APP_ENV === 'development' ? 'HS256' : 'RS256'
+      const jwtDecoded = verify(token, config.authentication.secret, { algorithms: [algorithms] })!
       const idProvider = await app.service(identityProviderPath).get(jwtDecoded.sub as string)
       authResult = {
         [identityProviderPath]: idProvider
