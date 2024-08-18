@@ -1196,7 +1196,7 @@
       "placeObjectAtOrigin": "Place Object at Origin"
     },
     "filebrowser": {
-      "tab-name": "Project Files",
+      "tab-name": "Files",
       "addNewFolder": "Add New Folder",
       "cutAsset": "Cut",
       "copyAsset": "Copy",

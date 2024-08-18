@@ -23,22 +23,24 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import Component from './index'
+import { PanelDragContainer, PanelTitle } from '@etherealengine/ui/src/components/editor/layout/Panel'
+import { TabData } from 'rc-dock'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
+import FileBrowser from './filebrowser'
 
-const argTypes = {}
-
-export default {
-  title: 'Editor/Panel/Files/Container',
-  component: Component,
-  parameters: {
-    componentSubtitle: 'FilesPanel',
-    jest: 'FilesPanelTitle.test.tsx',
-    design: {
-      type: 'figma',
-      url: ''
-    }
-  },
-  argTypes
+const FilesPanelTitle = () => {
+  const { t } = useTranslation()
+  return (
+    <PanelDragContainer>
+      <PanelTitle>{t('editor:layout.filebrowser.tab-name')}</PanelTitle>
+    </PanelDragContainer>
+  )
 }
 
-export const Default = { args: {} }
+export const FilesPanelTab: TabData = {
+  id: 'filesPanel',
+  closable: true,
+  title: <FilesPanelTitle />,
+  content: <FileBrowser />
+}

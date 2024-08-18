@@ -27,7 +27,6 @@ import { PopoverState } from '@etherealengine/client-core/src/common/services/Po
 import { staticResourcePath } from '@etherealengine/common/src/schema.type.module'
 import { NO_PROXY, getMutableState, useHookstate, useMutableState } from '@etherealengine/hyperflux'
 import { AssetsPanelTab } from '@etherealengine/ui/src/components/editor/panels/Assets'
-import { FilesPanelTab } from '@etherealengine/ui/src/components/editor/panels/Files'
 import { HierarchyPanelTab } from '@etherealengine/ui/src/components/editor/panels/Hierarchy'
 import { MaterialsPanelTab } from '@etherealengine/ui/src/components/editor/panels/Materials'
 import { PropertiesPanelTab } from '@etherealengine/ui/src/components/editor/panels/Properties'
@@ -60,6 +59,7 @@ import 'rc-dock/dist/rc-dock.css'
 import { useTranslation } from 'react-i18next'
 import { IoHelpCircleOutline } from 'react-icons/io5'
 import { setCurrentEditorScene } from '../functions/sceneFunctions'
+import { FilesPanelTab } from '../panels/files'
 import './EditorContainer.css'
 
 export const DockContainer = ({ children, id = 'editor-dock', dividerAlpha = 0 }) => {

@@ -30,9 +30,9 @@ import { bytesToSize } from '@etherealengine/common/src/utils/btyesToSize'
 import { Engine } from '@etherealengine/ecs'
 import { downloadBlobAsZip } from '@etherealengine/editor/src/functions/assetFunctions'
 import { defineState, getMutableState, useMutableState } from '@etherealengine/hyperflux'
+import Progress from '@etherealengine/ui/src/primitives/tailwind/Progress'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import Progress from '../../../../../primitives/tailwind/Progress'
 
 const DownloadProjectState = defineState({
   name: 'DownloadProjectState',
@@ -55,11 +55,11 @@ export const handleDownloadProject = async (projectName: string, selectedDirecto
 
   const downloadState = getMutableState(DownloadProjectState)
 
-  downloadState.isDownloading.set(true) // Start Download
+  downloadState.isDownloading.set(true)
 
   const response = await fetch(`${config.client.fileServer}/${data}`)
   const totalBytes = parseInt(response.headers.get('Content-Length') || '0', 10)
-  downloadState.total.set(totalBytes) // Set the total bytes
+  downloadState.total.set(totalBytes)
 
   const reader = response.body?.getReader()
   const chunks: Uint8Array[] = []
@@ -74,7 +74,7 @@ export const handleDownloadProject = async (projectName: string, selectedDirecto
   }
 
   const blob = new Blob(chunks)
-  downloadState.isDownloading.set(false) // Mark as completed
+  downloadState.isDownloading.set(false)
   downloadState.progress.set(0)
   downloadState.total.set(0)
 

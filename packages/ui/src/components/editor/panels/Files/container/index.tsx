@@ -37,18 +37,19 @@ import { CommonKnownContentTypes } from '@etherealengine/common/src/utils/Common
 import { bytesToSize } from '@etherealengine/common/src/utils/btyesToSize'
 import { unique } from '@etherealengine/common/src/utils/miscUtils'
 import { AssetSelectionChangePropsType } from '@etherealengine/editor/src/components/assets/AssetsPreviewPanel'
-import {
-  FilesViewModeSettings,
-  FilesViewModeState,
-  availableTableColumns
-} from '@etherealengine/editor/src/components/assets/FileBrowser/FileBrowserState'
 import { FileDataType } from '@etherealengine/editor/src/components/assets/FileBrowser/FileDataType'
 import ImageCompressionPanel from '@etherealengine/editor/src/components/assets/ImageCompressionPanel'
 import ModelCompressionPanel from '@etherealengine/editor/src/components/assets/ModelCompressionPanel'
 import { DndWrapper } from '@etherealengine/editor/src/components/dnd/DndWrapper'
 import { SupportedFileTypes } from '@etherealengine/editor/src/constants/AssetTypes'
 import { handleUploadFiles, inputFileWithAddToScene } from '@etherealengine/editor/src/functions/assetFunctions'
+import { ProjectDownloadProgress, handleDownloadProject } from '@etherealengine/editor/src/panels/files/download'
 import { EditorState } from '@etherealengine/editor/src/services/EditorServices'
+import {
+  FilesViewModeSettings,
+  FilesViewModeState,
+  availableTableColumns
+} from '@etherealengine/editor/src/services/FilesState'
 import { ClickPlacementState } from '@etherealengine/editor/src/systems/ClickPlacementSystem'
 import { AssetLoader } from '@etherealengine/engine/src/assets/classes/AssetLoader'
 import { ImmutableArray, NO_PROXY, getMutableState, useHookstate, useMutableState } from '@etherealengine/hyperflux'
@@ -80,7 +81,6 @@ import InputGroup from '../../../input/Group'
 import { FileBrowserItem, FileTableWrapper, canDropItemOverFolder } from '../browserGrid'
 import DeleteFileModal from '../browserGrid/DeleteFileModal'
 import FilePropertiesModal from '../browserGrid/FilePropertiesModal'
-import { ProjectDownloadProgress, handleDownloadProject } from '../download/projectDownload'
 import { FileUploadProgress } from '../upload/FileUploadProgress'
 
 type FileBrowserContentPanelProps = {
