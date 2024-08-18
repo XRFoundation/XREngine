@@ -33,10 +33,10 @@ import { UserID } from '../../schema.type.module'
 import { TypedString } from '../../types/TypeboxUtils'
 import { staticResourceSchema } from '../media/static-resource.schema'
 import { dataValidator, queryValidator } from '../validators'
-import { locationAdminSchema } from './location-admin.schema'
+import { locationAdminDataSchema, locationAdminSchema } from './location-admin.schema'
 import { locationAuthorizedUserSchema } from './location-authorized-user.schema'
 import { locationBanSchema } from './location-ban.schema'
-import { locationSettingSchema } from './location-setting.schema'
+import { locationSettingDataSchema, locationSettingPatchSchema, locationSettingSchema } from './location-setting.schema'
 
 export const locationPath = 'location'
 
@@ -78,23 +78,57 @@ export const locationSchema = Type.Object(
 )
 export interface LocationType extends Static<typeof locationSchema> {}
 
-export interface LocationDatabaseType
-  extends Omit<LocationType, 'locationSetting' | 'locationAuthorizedUsers' | 'locationBans' | 'url'> {}
+export const locationDatabaseSchema = Type.Omit(
+  locationSchema,
+  ['locationSetting', 'locationAuthorizedUsers', 'locationBans', 'locationAdmin', 'sceneAsset', 'url'],
+  {
+    $id: 'LocationDatabase'
+  }
+)
+export interface LocationDatabaseType extends Static<typeof locationDatabaseSchema> {}
 
 // Schema for creating new entries
-export const locationDataSchema = Type.Pick(
-  locationSchema,
-  ['name', 'sceneId', 'slugifiedName', 'isLobby', 'isFeatured', 'maxUsersPerInstance', 'locationSetting'],
-  {
-    $id: 'LocationData'
-  }
+export const locationDataProperties = Type.Pick(locationSchema, [
+  'name',
+  'sceneId',
+  'slugifiedName',
+  'isLobby',
+  'isFeatured',
+  'maxUsersPerInstance'
+])
+
+export const locationDataSchema = Type.Intersect(
+  [
+    locationDataProperties,
+    Type.Object(
+      {
+        id: Type.Optional(
+          TypedString<LocationID>({
+            format: 'uuid'
+          })
+        ),
+        locationAdmin: Type.Optional(Type.Ref(locationAdminDataSchema)),
+        locationSetting: Type.Ref(locationSettingDataSchema)
+      },
+      { additionalProperties: false }
+    )
+  ],
+  { $id: 'LocationData' }
 )
 export interface LocationData extends Static<typeof locationDataSchema> {}
 
 // Schema for updating existing entries
-export const locationPatchSchema = Type.Partial(locationSchema, {
-  $id: 'LocationPatch'
-})
+export const locationPatchSchema = Type.Intersect(
+  [
+    Type.Partial(locationDatabaseSchema),
+    Type.Object({
+      locationSetting: Type.Optional(Type.Ref(locationSettingPatchSchema))
+    })
+  ],
+  {
+    $id: 'LocationPatch'
+  }
+)
 export interface LocationPatch extends Static<typeof locationPatchSchema> {}
 
 // Schema for allowed query properties
@@ -115,9 +149,7 @@ export const locationQuerySchema = Type.Intersect(
         $like: Type.String()
       },
       sceneId: {
-        $like: Type.String({
-          format: 'uuid'
-        })
+        $like: Type.String()
       }
     }),
     // Add additional query properties here

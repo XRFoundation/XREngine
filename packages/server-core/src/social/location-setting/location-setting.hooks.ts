@@ -50,20 +50,20 @@ export default {
 
   before: {
     all: [
-      () => schemaHooks.validateQuery(locationSettingQueryValidator),
+      schemaHooks.validateQuery(locationSettingQueryValidator),
       schemaHooks.resolveQuery(locationSettingQueryResolver)
     ],
     find: [],
     get: [],
     create: [
       disallow('external'),
-      () => schemaHooks.validateData(locationSettingDataValidator),
+      schemaHooks.validateData(locationSettingDataValidator),
       schemaHooks.resolveData(locationSettingDataResolver)
     ],
     update: [disallow('external')],
     patch: [
       disallow('external'),
-      () => schemaHooks.validateData(locationSettingPatchValidator),
+      schemaHooks.validateData(locationSettingPatchValidator),
       schemaHooks.resolveData(locationSettingPatchResolver)
     ],
     remove: [disallow('external')]

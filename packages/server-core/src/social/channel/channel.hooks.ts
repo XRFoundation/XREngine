@@ -259,12 +259,14 @@ const createSelfOwner = async (context: HookContext<ChannelService>) => {
 const createChannelUsers = async (context: HookContext<ChannelService>) => {
   /** @todo ensure all users specified are friends of loggedInUser */
 
+  const result = Array.isArray(context.result) ? context.result : ([context.result] as ChannelType[])
+
   const process = async (item: ChannelData) => {
     if (item.users) {
       await Promise.all(
         context.actualData.users.map(async (user) =>
           context.app.service(channelUserPath).create({
-            channelId: item.id as ChannelID,
+            channelId: result[0].id as ChannelID,
             userId: user
           })
         )
@@ -294,7 +296,7 @@ export default {
     ],
     get: [setLoggedInUser('userId'), iff(isProvider('external'), ensureUserHasChannelAccess)],
     create: [
-      () => schemaHooks.validateData(channelDataValidator),
+      schemaHooks.validateData(channelDataValidator),
       schemaHooks.resolveData(channelDataResolver),
       iff(isProvider('external'), ensureUsersFriendWithOwner),
       checkExistingChannel,
@@ -304,7 +306,7 @@ export default {
     update: [disallow('external')],
     patch: [
       iff(isProvider('external'), verifyScope('channel', 'write')),
-      () => schemaHooks.validateData(channelPatchValidator),
+      schemaHooks.validateData(channelPatchValidator),
       schemaHooks.resolveData(channelPatchResolver)
     ],
     remove: [iff(isProvider('external'), ensureUserChannelOwner)]

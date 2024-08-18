@@ -26,6 +26,7 @@ import { PopoverState } from '@etherealengine/client-core/src/common/services/Po
 import {
   LocationData,
   LocationID,
+  LocationPatch,
   locationPath,
   LocationType,
   staticResourcePath
@@ -60,7 +61,13 @@ export default function AddEditLocationModal(props: { location?: LocationType; s
 
   const locationID = useHookstate(props.location?.id || null)
 
-  const locationQuery = useFind(locationPath, { query: { id: locationID.value } })
+  const params = {
+    query: {
+      id: locationID.value
+    }
+  }
+
+  const locationQuery = useFind(locationPath, locationID.value ? params : undefined)
   const location = locationID.value ? locationQuery.data[0] : undefined
 
   const locationMutation = useMutation(locationPath)
@@ -139,15 +146,12 @@ export default function AddEditLocationModal(props: { location?: LocationType; s
       sceneId: scene.value,
       maxUsersPerInstance: maxUsers.value,
       locationSetting: {
-        id: '',
         locationId: '' as LocationID,
         locationType: locationType.value,
-        audioEnabled: audioEnabled.value,
-        screenSharingEnabled: screenSharingEnabled.value,
+        audioEnabled: Boolean(audioEnabled.value),
+        screenSharingEnabled: Boolean(screenSharingEnabled.value),
         faceStreamingEnabled: false,
-        videoEnabled: videoEnabled.value,
-        createdAt: '',
-        updatedAt: ''
+        videoEnabled: Boolean(videoEnabled.value)
       },
       isLobby: false,
       isFeatured: false
@@ -155,7 +159,9 @@ export default function AddEditLocationModal(props: { location?: LocationType; s
 
     try {
       if (location?.id) {
-        await locationMutation.patch(location.id, locationData, { query: { projectId: location.projectId } })
+        await locationMutation.patch(location.id, locationData as LocationPatch, {
+          query: { projectId: location.projectId }
+        })
       } else {
         const response = await locationMutation.create(locationData)
         locationID.set(response.id)

@@ -127,11 +127,11 @@ export default {
   },
 
   before: {
-    all: [() => schemaHooks.validateQuery(messageQueryValidator), schemaHooks.resolveQuery(messageQueryResolver)],
+    all: [schemaHooks.validateQuery(messageQueryValidator), schemaHooks.resolveQuery(messageQueryResolver)],
     find: [iff(isProvider('external'), channelPermissionAuthenticate())],
     get: [],
     create: [
-      () => schemaHooks.validateData(messageDataValidator),
+      schemaHooks.validateData(messageDataValidator),
       schemaHooks.resolveData(messageDataResolver),
       disallowEmptyMessage,
       setLoggedInUser('senderId'),
@@ -142,7 +142,7 @@ export default {
     patch: [
       messagePermissionAuthenticate(),
       disallowEmptyMessage,
-      () => schemaHooks.validateData(messagePatchValidator),
+      schemaHooks.validateData(messagePatchValidator),
       schemaHooks.resolveData(messagePatchResolver)
     ],
     remove: [messagePermissionAuthenticate()]

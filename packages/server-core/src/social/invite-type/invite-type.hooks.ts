@@ -46,18 +46,18 @@ export default {
   },
 
   before: {
-    all: [() => schemaHooks.validateQuery(inviteTypeQueryValidator), schemaHooks.resolveQuery(inviteTypeQueryResolver)],
+    all: [schemaHooks.validateQuery(inviteTypeQueryValidator), schemaHooks.resolveQuery(inviteTypeQueryResolver)],
     find: [],
     get: [],
     create: [
       disallow('external'),
-      () => schemaHooks.validateData(inviteTypeDataValidator),
+      schemaHooks.validateData(inviteTypeDataValidator),
       schemaHooks.resolveData(inviteTypeDataResolver)
     ],
     update: [disallow()],
     patch: [
       disallow(),
-      () => schemaHooks.validateData(inviteTypePatchValidator),
+      schemaHooks.validateData(inviteTypePatchValidator),
       schemaHooks.resolveData(inviteTypePatchResolver)
     ],
     remove: [disallow('external')]

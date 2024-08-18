@@ -44,7 +44,6 @@ export const createLocations = async (app: Application, projectName: string, sce
 
       const assetURL = `projects/${projectName}/${fileName}`
       const locationId = uuidv4() as LocationID
-      const settingsId = uuidv4()
 
       const scene = (
         await app.service(staticResourcePath).find({
@@ -54,7 +53,6 @@ export const createLocations = async (app: Application, projectName: string, sce
       if (!scene) return logger.warn(`Location ${cleanedLocationName} Scene not found for ${fileName}`)
 
       const locationSetting = {
-        id: settingsId,
         locationId,
         locationType: 'public',
         audioEnabled: true,
@@ -62,6 +60,7 @@ export const createLocations = async (app: Application, projectName: string, sce
         screenSharingEnabled: true,
         faceStreamingEnabled: true
       } as LocationSettingType
+
       const location = {
         id: locationId,
         name: cleanedLocationName,

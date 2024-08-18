@@ -64,7 +64,7 @@ export const channelSchema = Type.Object(
 export interface ChannelType extends Static<typeof channelSchema> {}
 
 // Schema for creating new entries
-export const channelDataProperties = Type.Partial(channelSchema)
+export const channelDataProperties = Type.Partial(Type.Pick(channelSchema, ['name', 'instanceId']))
 
 export const channelDataSchema = Type.Intersect(
   [

@@ -153,22 +153,16 @@ export default {
   },
 
   before: {
-    all: [
-      () => schemaHooks.validateQuery(channelUserQueryValidator),
-      schemaHooks.resolveQuery(channelUserQueryResolver)
-    ],
+    all: [schemaHooks.validateQuery(channelUserQueryValidator), schemaHooks.resolveQuery(channelUserQueryResolver)],
     find: [],
     get: [disallow('external')],
     create: [
       iff(isProvider('external'), verifyScope('channel', 'write')),
-      () => schemaHooks.validateData(channelUserDataValidator),
+      schemaHooks.validateData(channelUserDataValidator),
       schemaHooks.resolveData(channelUserDataResolver)
     ],
     update: [disallow('external')],
-    patch: [
-      () => schemaHooks.validateData(channelUserPatchValidator),
-      schemaHooks.resolveData(channelUserPatchResolver)
-    ],
+    patch: [schemaHooks.validateData(channelUserPatchValidator), schemaHooks.resolveData(channelUserPatchResolver)],
     remove: [iff(isProvider('external'), disallowId, ensureUserIsOwner)]
   },
 

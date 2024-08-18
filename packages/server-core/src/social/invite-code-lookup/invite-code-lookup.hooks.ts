@@ -43,7 +43,7 @@ export default {
 
   before: {
     all: [
-      () => schemaHooks.validateQuery(inviteCodeLookupQueryValidator),
+      schemaHooks.validateQuery(inviteCodeLookupQueryValidator),
       schemaHooks.resolveQuery(inviteCodeLookupQueryResolver)
     ],
     find: [],

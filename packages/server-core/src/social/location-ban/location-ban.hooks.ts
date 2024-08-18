@@ -47,21 +47,18 @@ export default {
   },
 
   before: {
-    all: [
-      () => schemaHooks.validateQuery(locationBanQueryValidator),
-      schemaHooks.resolveQuery(locationBanQueryResolver)
-    ],
+    all: [schemaHooks.validateQuery(locationBanQueryValidator), schemaHooks.resolveQuery(locationBanQueryResolver)],
     find: [],
     get: [],
     create: [
       iff(isProvider('external'), verifyLocationAdmin()),
-      () => schemaHooks.validateData(locationBanDataValidator),
+      schemaHooks.validateData(locationBanDataValidator),
       schemaHooks.resolveData(locationBanDataResolver)
     ],
     update: [disallow()],
     patch: [
       disallow(),
-      () => schemaHooks.validateData(locationBanPatchValidator),
+      schemaHooks.validateData(locationBanPatchValidator),
       schemaHooks.resolveData(locationBanPatchResolver)
     ],
     remove: [iff(isProvider('external'), verifyLocationAdmin())]

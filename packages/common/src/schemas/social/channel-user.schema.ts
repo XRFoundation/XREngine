@@ -53,9 +53,18 @@ export const channelUserSchema = Type.Object(
 export interface ChannelUserType extends Static<typeof channelUserSchema> {}
 
 // Schema for creating new entries
-export const channelUserDataSchema = Type.Partial(channelUserSchema, {
-  $id: 'ChannelUserData'
-})
+export const channelUserDataSchema = Type.Partial(
+  Type.Intersect([
+    Type.Pick(channelUserSchema, ['channelId', 'userId']),
+    Type.Object(
+      {
+        isOwner: Type.Optional(Type.Boolean())
+      },
+      { additionalProperties: false }
+    )
+  ]),
+  { $id: 'ChannelUserData' }
+)
 export interface ChannelUserData extends Static<typeof channelUserDataSchema> {}
 
 // Schema for updating existing entries

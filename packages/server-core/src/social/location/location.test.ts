@@ -31,6 +31,7 @@ import { LocationID, locationPath, LocationType } from '@etherealengine/common/s
 import { destroyEngine } from '@etherealengine/ecs/src/Engine'
 
 import { staticResourcePath } from '@etherealengine/common/src/schema.type.module'
+import { getDateTimeSql } from '@etherealengine/common/src/utils/datetime-sql'
 import { Application } from '../../../declarations'
 import { createFeathersKoaApp } from '../../createApp'
 import { LocationParams } from './location.class'
@@ -66,15 +67,12 @@ describe('location.test', () => {
         sceneId: scene.data[0].id,
         maxUsersPerInstance: 20,
         locationSetting: {
-          id: '',
           locationType: 'public',
           audioEnabled: true,
           videoEnabled: true,
           faceStreamingEnabled: false,
           screenSharingEnabled: false,
-          locationId: '' as LocationID,
-          createdAt: '',
-          updatedAt: ''
+          locationId: '' as LocationID
         },
         isLobby: false,
         isFeatured: false
@@ -104,21 +102,19 @@ describe('location.test', () => {
       videoEnabled: true,
       faceStreamingEnabled: false,
       screenSharingEnabled: false,
-      locationId: locations[0].id
+      locationId: locations[0].id,
+      createdAt: await getDateTimeSql(),
+      updatedAt: await getDateTimeSql()
     })
 
-    const locationData = JSON.parse(JSON.stringify(locations[0]))
-    delete locationData.locationBans
-    delete locationData.locationAuthorizedUsers
-    delete locationData.locationAdmin
-    delete locationData.createdAt
-    delete locationData.updatedAt
-    delete locationData.sceneAsset
-    delete locationData.url
+    locationSetting.audioEnabled = true
+    locationSetting.videoEnabled = true
+    locationSetting.faceStreamingEnabled = false
+    locationSetting.screenSharingEnabled = false
 
     const item = (await app
       .service(locationPath)
-      .patch(locations[0].id, { ...locationData, name: newName, locationSetting })) as any as LocationType
+      .patch(locations[0].id, { name: newName, locationSetting })) as any as LocationType
 
     assert.ok(item)
     assert.equal(item.name, newName)

@@ -51,20 +51,20 @@ export default {
 
   before: {
     all: [
-      () => schemaHooks.validateQuery(locationAuthorizedUserQueryValidator),
+      schemaHooks.validateQuery(locationAuthorizedUserQueryValidator),
       schemaHooks.resolveQuery(locationAuthorizedUserQueryResolver)
     ],
     find: [iff(isProvider('external'), attachOwnerIdInQuery('userId'))],
     get: [iff(isProvider('external'), attachOwnerIdInQuery('userId'))],
     create: [
       disallow('external'),
-      () => schemaHooks.validateData(locationAuthorizedUserDataValidator),
+      schemaHooks.validateData(locationAuthorizedUserDataValidator),
       schemaHooks.resolveData(locationAuthorizedUserDataResolver)
     ],
     update: [disallow('external')],
     patch: [
       disallow('external'),
-      () => schemaHooks.validateData(locationAuthorizedUserPatchValidator),
+      schemaHooks.validateData(locationAuthorizedUserPatchValidator),
       schemaHooks.resolveData(locationAuthorizedUserPatchResolver)
     ],
     remove: [disallow('external')]

@@ -41,9 +41,7 @@ export const locationSettingSchema = Type.Object(
     id: Type.String({
       format: 'uuid'
     }),
-    locationId: TypedString<LocationID>({
-      format: 'uuid'
-    }),
+    locationId: TypedString<LocationID>(),
     /** @todo review */
     locationType: StringEnum(['private', 'public', 'showroom']),
     audioEnabled: Type.Boolean(),
@@ -59,13 +57,9 @@ export const locationSettingSchema = Type.Object(
 export interface LocationSettingType extends Static<typeof locationSettingSchema> {}
 
 // Schema for creating new entries
-export const locationSettingDataSchema = Type.Pick(
-  locationSettingSchema,
-  ['locationId', 'locationType', 'audioEnabled', 'screenSharingEnabled', 'faceStreamingEnabled', 'videoEnabled'],
-  {
-    $id: 'LocationSettingData'
-  }
-)
+export const locationSettingDataSchema = Type.Partial(locationSettingSchema, {
+  $id: 'LocationSettingData'
+})
 export interface LocationSettingData extends Static<typeof locationSettingDataSchema> {}
 
 // Schema for updating existing entries

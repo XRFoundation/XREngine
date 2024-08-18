@@ -46,21 +46,18 @@ export default {
   },
 
   before: {
-    all: [
-      () => schemaHooks.validateQuery(locationTypeQueryValidator),
-      schemaHooks.resolveQuery(locationTypeQueryResolver)
-    ],
+    all: [schemaHooks.validateQuery(locationTypeQueryValidator), schemaHooks.resolveQuery(locationTypeQueryResolver)],
     find: [],
     get: [],
     create: [
       disallow('external'),
-      () => schemaHooks.validateData(locationTypeDataValidator),
+      schemaHooks.validateData(locationTypeDataValidator),
       schemaHooks.resolveData(locationTypeDataResolver)
     ],
     update: [disallow()],
     patch: [
       disallow(),
-      () => schemaHooks.validateData(locationTypePatchValidator),
+      schemaHooks.validateData(locationTypePatchValidator),
       schemaHooks.resolveData(locationTypePatchResolver)
     ],
     remove: [disallow('external')]

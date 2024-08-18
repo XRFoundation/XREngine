@@ -48,21 +48,18 @@ export default {
   },
 
   before: {
-    all: [
-      () => schemaHooks.validateQuery(locationAdminQueryValidator),
-      schemaHooks.resolveQuery(locationAdminQueryResolver)
-    ],
+    all: [schemaHooks.validateQuery(locationAdminQueryValidator), schemaHooks.resolveQuery(locationAdminQueryResolver)],
     find: [iff(isProvider('external'), attachOwnerIdInQuery('userId'))],
     get: [disallow('external')],
     create: [
       iff(isProvider('external'), verifyScope('location', 'write')),
-      () => schemaHooks.validateData(locationAdminDataValidator),
+      schemaHooks.validateData(locationAdminDataValidator),
       schemaHooks.resolveData(locationAdminDataResolver)
     ],
     update: [disallow()],
     patch: [
       iff(isProvider('external'), verifyScope('location', 'write')),
-      () => schemaHooks.validateData(locationAdminPatchValidator),
+      schemaHooks.validateData(locationAdminPatchValidator),
       schemaHooks.resolveData(locationAdminPatchResolver)
     ],
     remove: [iff(isProvider('external'), verifyScope('location', 'write'))]
