@@ -44,9 +44,9 @@ export const instanceResolver = resolve<InstanceType, HookContext>({
     if (context.event !== 'removed' && instance.locationId)
       return await context.app.service(locationPath).get(instance.locationId)
   }),
-  assignedAt: virtual(async (location) => (location.assignedAt ? fromDateTimeSql(location.assignedAt) : '')),
-  createdAt: virtual(async (location) => fromDateTimeSql(location.createdAt)),
-  updatedAt: virtual(async (location) => fromDateTimeSql(location.updatedAt))
+  assignedAt: virtual(async (instance) => (instance.assignedAt ? fromDateTimeSql(instance.assignedAt) : '')),
+  createdAt: virtual(async (instance) => fromDateTimeSql(instance.createdAt)),
+  updatedAt: virtual(async (instance) => fromDateTimeSql(instance.updatedAt))
 })
 
 export const instanceExternalResolver = resolve<InstanceType, HookContext>({})

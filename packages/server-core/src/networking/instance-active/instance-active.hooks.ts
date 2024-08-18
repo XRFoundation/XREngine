@@ -45,7 +45,7 @@ export default {
 
   before: {
     all: [
-      () => schemaHooks.validateQuery(instanceActiveQueryValidator),
+      schemaHooks.validateQuery(instanceActiveQueryValidator),
       schemaHooks.resolveQuery(instanceActiveQueryResolver)
     ],
     find: [iff(isProvider('external'), verifyScope('instance', 'read'))],

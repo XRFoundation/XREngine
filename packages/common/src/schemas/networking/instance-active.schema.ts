@@ -51,9 +51,7 @@ export const instanceActiveQuerySchema = Type.Intersect(
     // Add additional query properties here
     Type.Object(
       {
-        sceneId: Type.String({
-          format: 'uuid'
-        })
+        sceneId: Type.String()
       },
       { additionalProperties: false }
     )

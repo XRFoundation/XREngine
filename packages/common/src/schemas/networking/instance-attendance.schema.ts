@@ -30,7 +30,7 @@ import { getValidator, querySyntax, Type } from '@feathersjs/typebox'
 import { TypedString } from '../../types/TypeboxUtils'
 import { UserID } from '../user/user.schema'
 import { dataValidator, queryValidator } from '../validators'
-import { InstanceID } from './instance.schema'
+import { InstanceID, instanceSchema } from './instance.schema'
 
 export const instanceAttendancePath = 'instance-attendance'
 
@@ -42,9 +42,7 @@ export const instanceAttendanceSchema = Type.Object(
     id: Type.String({
       format: 'uuid'
     }),
-    sceneId: Type.String({
-      format: 'uuid'
-    }),
+    sceneId: Type.Optional(Type.String()),
     isChannel: Type.Boolean(),
     ended: Type.Boolean(),
     instanceId: TypedString<InstanceID>({
@@ -53,7 +51,7 @@ export const instanceAttendanceSchema = Type.Object(
     userId: TypedString<UserID>({
       format: 'uuid'
     }),
-    instance: Type.Any(), // TODO: Replace any with instance schema once instance service is moved to feathers 5.
+    instance: Type.Ref(instanceSchema),
     createdAt: Type.String({ format: 'date-time' }),
     updatedAt: Type.String({ format: 'date-time' })
   },
@@ -64,7 +62,7 @@ export interface InstanceAttendanceType extends Static<typeof instanceAttendance
 // Schema for creating new entries
 export const instanceAttendanceDataSchema = Type.Pick(
   instanceAttendanceSchema,
-  ['sceneId', 'isChannel', 'ended', 'instanceId', 'userId'],
+  ['isChannel', 'instanceId', 'userId', 'sceneId'],
   {
     $id: 'InstanceAttendanceData'
   }

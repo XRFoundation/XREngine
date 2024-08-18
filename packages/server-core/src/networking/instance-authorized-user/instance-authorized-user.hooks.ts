@@ -51,18 +51,18 @@ export default {
   before: {
     all: [
       disallow('external'),
-      () => schemaHooks.validateQuery(instanceAuthorizedUserQueryValidator),
+      schemaHooks.validateQuery(instanceAuthorizedUserQueryValidator),
       schemaHooks.resolveQuery(instanceAuthorizedUserQueryResolver)
     ],
     find: [],
     get: [],
     create: [
-      () => schemaHooks.validateData(instanceAuthorizedUserDataValidator),
+      schemaHooks.validateData(instanceAuthorizedUserDataValidator),
       schemaHooks.resolveData(instanceAuthorizedUserDataResolver)
     ],
     update: [],
     patch: [
-      () => schemaHooks.validateData(instanceAuthorizedUserPatchValidator),
+      schemaHooks.validateData(instanceAuthorizedUserPatchValidator),
       schemaHooks.resolveData(instanceAuthorizedUserPatchResolver)
     ],
     remove: []

@@ -154,7 +154,7 @@ const assignExistingInstance = async ({
       currentUsers: existingInstance.currentUsers + 1,
       podName: config.kubernetes.enabled ? instanceServerState.instanceServer.value?.objectMeta?.name : 'local',
       assigned: false,
-      assignedAt: null!
+      assignedAt: null
     },
     { headers }
   )
@@ -443,7 +443,7 @@ const updateInstance = async ({
           currentUsers: (instance.currentUsers as number) + 1,
           assigned: false,
           podName: config.kubernetes.enabled ? instanceServerState.instanceServer?.objectMeta?.name : 'local',
-          assignedAt: null!
+          assignedAt: null
         },
         { headers }
       )
