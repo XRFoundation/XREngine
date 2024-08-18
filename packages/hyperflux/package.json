@@ -27,6 +27,6 @@
     "uuid": "9.0.0"
   },
   "scripts": {
-    "test": "cross-env TEST=true mocha --config .mocharc.js"
+    "test": "cross-env TEST=true vitest run"
   }
 }

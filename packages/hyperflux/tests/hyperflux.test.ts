@@ -23,8 +23,8 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import assert from 'assert'
 import matches from 'ts-matches'
+import { assert, describe, it } from 'vitest'
 
 import { PeerID } from '@etherealengine/hyperflux'
 

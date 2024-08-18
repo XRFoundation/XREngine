@@ -24,8 +24,8 @@ Ethereal Engine. All Rights Reserved.
 */
 
 import { act, render } from '@testing-library/react'
-import assert from 'assert'
 import React, { useEffect } from 'react'
+import { assert, describe, it } from 'vitest'
 
 import { createHyperStore, defineState, getMutableState, NO_PROXY, NO_PROXY_STEALTH, none, useHookstate } from '..'
 
