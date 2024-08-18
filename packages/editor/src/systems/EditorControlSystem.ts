@@ -157,7 +157,8 @@ const onKeyX = () => {
 }
 
 const onKeyZ = (control: boolean, shift: boolean) => {
-  const source = getState(EditorState).scenePath
+  const sourceEntity = getState(EditorState).rootEntity
+  const source = getComponent(sourceEntity, SourceComponent)
   if (!source) return
   if (control) {
     const state = getState(GLTFSnapshotState)[source]
