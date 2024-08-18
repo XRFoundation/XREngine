@@ -1,3 +1,7 @@
+# Ethereal Engine is now Infinite Reality Engine and has been moved!
+
+## You can find the project now at https://github.com/ir-engine/ir-engine
+
 ![iR Square Black Small](https://github.com/EtherealEngine/etherealengine/assets/5104160/51d93122-3325-46d9-b111-2562fd8802c1)
 
 >  Manifest your dreams on the open social spatial web.
