@@ -88,7 +88,7 @@ const EmailTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableRefO
     if (!id || !smtp.value || !auth.value || !from.value || !subject.value) return
 
     patchEmailSetting(id, {
-      smtp: { ...smtp.value, auth: auth.value },
+      smtp: { ...smtp.value, auth: auth.value, secure: Boolean(smtp.value.secure) },
       from: from.value,
       subject: subject.value
     })

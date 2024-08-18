@@ -55,7 +55,7 @@ export default {
 
   before: {
     all: [
-      () => schemaHooks.validateQuery(projectSettingQueryValidator),
+      schemaHooks.validateQuery(projectSettingQueryValidator),
       schemaHooks.resolveQuery(projectSettingQueryResolver)
     ],
     find: [
@@ -77,7 +77,7 @@ export default {
     get: [],
     create: [
       setLoggedInUserInData('userId'),
-      () => schemaHooks.validateData(projectSettingDataValidator),
+      schemaHooks.validateData(projectSettingDataValidator),
       schemaHooks.resolveData(projectSettingDataResolver),
       iff(
         isProvider('external'),
@@ -90,7 +90,7 @@ export default {
     ],
     patch: [
       setLoggedInUserInData('userId'),
-      () => schemaHooks.validateData(projectSettingPatchValidator),
+      schemaHooks.validateData(projectSettingPatchValidator),
       schemaHooks.resolveData(projectSettingPatchResolver),
       iff(
         isProvider('external'),

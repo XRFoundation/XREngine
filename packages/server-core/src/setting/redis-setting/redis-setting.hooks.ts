@@ -49,20 +49,20 @@ export default {
   before: {
     all: [
       iff(isProvider('external'), verifyScope('admin', 'admin')),
-      () => schemaHooks.validateQuery(redisSettingQueryValidator),
+      schemaHooks.validateQuery(redisSettingQueryValidator),
       schemaHooks.resolveQuery(redisSettingQueryResolver)
     ],
     find: [iff(isProvider('external'), verifyScope('settings', 'read'))],
     get: [iff(isProvider('external'), verifyScope('settings', 'read'))],
     create: [
       iff(isProvider('external'), verifyScope('settings', 'write')),
-      () => schemaHooks.validateData(redisSettingDataValidator),
+      schemaHooks.validateData(redisSettingDataValidator),
       schemaHooks.resolveData(redisSettingDataResolver)
     ],
     update: [iff(isProvider('external'), verifyScope('settings', 'write'))],
     patch: [
       iff(isProvider('external'), verifyScope('settings', 'write')),
-      () => schemaHooks.validateData(redisSettingPatchValidator),
+      schemaHooks.validateData(redisSettingPatchValidator),
       schemaHooks.resolveData(redisSettingPatchResolver)
     ],
     remove: [iff(isProvider('external'), verifyScope('settings', 'write'))]

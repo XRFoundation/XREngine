@@ -100,6 +100,7 @@ const ClientTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableRef
     event.preventDefault()
     const newSettings = {
       ...settingsState.get(NO_PROXY),
+      homepageLinkButtonEnabled: Boolean(settingsState.value!.homepageLinkButtonEnabled),
       createdAt: undefined!,
       updatedAt: undefined!
     } as any as ClientSettingType

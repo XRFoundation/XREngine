@@ -132,20 +132,20 @@ export default {
 
   before: {
     all: [
-      () => schemaHooks.validateQuery(authenticationSettingQueryValidator),
+      schemaHooks.validateQuery(authenticationSettingQueryValidator),
       schemaHooks.resolveQuery(authenticationSettingQueryResolver)
     ],
     find: [],
     get: [iff(isProvider('external'), verifyScope('admin', 'admin'), verifyScope('settings', 'read'))],
     create: [
       iff(isProvider('external'), verifyScope('admin', 'admin'), verifyScope('settings', 'write')),
-      () => schemaHooks.validateData(authenticationSettingDataValidator),
+      schemaHooks.validateData(authenticationSettingDataValidator),
       schemaHooks.resolveData(authenticationSettingDataResolver)
     ],
     update: [iff(isProvider('external'), verifyScope('admin', 'admin'), verifyScope('settings', 'write'))],
     patch: [
       iff(isProvider('external'), verifyScope('admin', 'admin'), verifyScope('settings', 'write')),
-      () => schemaHooks.validateData(authenticationSettingPatchValidator),
+      schemaHooks.validateData(authenticationSettingPatchValidator),
       schemaHooks.resolveData(authenticationSettingPatchResolver),
       ensureOAuth
     ],

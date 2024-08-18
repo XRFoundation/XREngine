@@ -49,20 +49,20 @@ export default {
   before: {
     all: [
       iff(isProvider('external'), verifyScope('admin', 'admin')),
-      () => schemaHooks.validateQuery(helmSettingQueryValidator),
+      schemaHooks.validateQuery(helmSettingQueryValidator),
       schemaHooks.resolveQuery(helmSettingQueryResolver)
     ],
     find: [iff(isProvider('external'), verifyScope('settings', 'read'))],
     get: [iff(isProvider('external'), verifyScope('settings', 'read'))],
     create: [
       iff(isProvider('external'), verifyScope('settings', 'write')),
-      () => schemaHooks.validateData(helmSettingDataValidator),
+      schemaHooks.validateData(helmSettingDataValidator),
       schemaHooks.resolveData(helmSettingDataResolver)
     ],
     update: [iff(isProvider('external'), verifyScope('settings', 'write'))],
     patch: [
       iff(isProvider('external'), verifyScope('settings', 'write')),
-      () => schemaHooks.validateData(helmSettingPatchValidator),
+      schemaHooks.validateData(helmSettingPatchValidator),
       schemaHooks.resolveData(helmSettingPatchResolver)
     ],
     remove: [iff(isProvider('external'), verifyScope('settings', 'write'))]

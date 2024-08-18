@@ -59,9 +59,13 @@ export const projectSettingSchema = Type.Object(
 export interface ProjectSettingType extends Static<typeof projectSettingSchema> {}
 
 // Schema for creating new entries
-export const projectSettingDataSchema = Type.Pick(projectSettingSchema, ['key', 'value', 'type', 'projectId'], {
-  $id: 'ProjectSettingData'
-})
+export const projectSettingDataSchema = Type.Pick(
+  projectSettingSchema,
+  ['key', 'value', 'type', 'projectId', 'userId'],
+  {
+    $id: 'ProjectSettingData'
+  }
+)
 export interface ProjectSettingData extends Static<typeof projectSettingDataSchema> {}
 
 // Schema for updating existing entries

@@ -132,21 +132,18 @@ export default {
   },
 
   before: {
-    all: [
-      () => schemaHooks.validateQuery(clientSettingQueryValidator),
-      schemaHooks.resolveQuery(clientSettingQueryResolver)
-    ],
+    all: [schemaHooks.validateQuery(clientSettingQueryValidator), schemaHooks.resolveQuery(clientSettingQueryResolver)],
     find: [],
     get: [],
     create: [
       iff(isProvider('external'), verifyScope(clientSettingPath, 'write')),
-      () => schemaHooks.validateData(clientSettingDataValidator),
+      schemaHooks.validateData(clientSettingDataValidator),
       schemaHooks.resolveData(clientSettingDataResolver)
     ],
     update: [iff(isProvider('external'), verifyScope(clientSettingPath, 'write'))],
     patch: [
       iff(isProvider('external'), verifyScope(clientSettingPath, 'write')),
-      () => schemaHooks.validateData(clientSettingPatchValidator),
+      schemaHooks.validateData(clientSettingPatchValidator),
       schemaHooks.resolveData(clientSettingPatchResolver),
       updateWebManifest
     ],

@@ -52,7 +52,7 @@ export default {
 
   before: {
     all: [
-      () => schemaHooks.validateQuery(featureFlagSettingQueryValidator),
+      schemaHooks.validateQuery(featureFlagSettingQueryValidator),
       schemaHooks.resolveQuery(featureFlagSettingQueryResolver)
     ],
     find: [iff(isProvider('external'), enableClientPagination())],
@@ -60,14 +60,14 @@ export default {
     create: [
       setLoggedInUserInData('userId'),
       iff(isProvider('external'), verifyScope('settings', 'write')),
-      () => schemaHooks.validateData(featureFlagSettingDataValidator),
+      schemaHooks.validateData(featureFlagSettingDataValidator),
       schemaHooks.resolveData(featureFlagSettingDataResolver)
     ],
     update: [setLoggedInUserInData('userId'), iff(isProvider('external'), verifyScope('settings', 'write'))],
     patch: [
       setLoggedInUserInData('userId'),
       iff(isProvider('external'), verifyScope('settings', 'write')),
-      () => schemaHooks.validateData(featureFlagSettingPatchValidator),
+      schemaHooks.validateData(featureFlagSettingPatchValidator),
       schemaHooks.resolveData(featureFlagSettingPatchResolver)
     ],
     remove: [iff(isProvider('external'), verifyScope('settings', 'write'))]

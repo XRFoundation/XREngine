@@ -52,20 +52,20 @@ export default {
   before: {
     all: [
       iff(isProvider('external'), verifyScope('admin', 'admin')),
-      () => schemaHooks.validateQuery(taskServerSettingQueryValidator),
+      schemaHooks.validateQuery(taskServerSettingQueryValidator),
       schemaHooks.resolveQuery(taskServerSettingQueryResolver)
     ],
     find: [iff(isProvider('external'), verifyScope('settings', 'read'))],
     get: [iff(isProvider('external'), verifyScope('settings', 'read'))],
     create: [
       iff(isProvider('external'), verifyScope('settings', 'write')),
-      () => schemaHooks.validateData(taskServerSettingDataValidator),
+      schemaHooks.validateData(taskServerSettingDataValidator),
       schemaHooks.resolveData(taskServerSettingDataResolver)
     ],
     update: [iff(isProvider('external'), verifyScope('settings', 'write'))],
     patch: [
       iff(isProvider('external'), verifyScope('settings', 'write')),
-      () => schemaHooks.validateData(taskServerSettingPatchValidator),
+      schemaHooks.validateData(taskServerSettingPatchValidator),
       schemaHooks.resolveData(taskServerSettingPatchResolver)
     ],
     remove: [iff(isProvider('external'), verifyScope('settings', 'write'))]

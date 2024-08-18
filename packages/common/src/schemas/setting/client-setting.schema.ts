@@ -65,6 +65,7 @@ export const videoSettingsSchema = Type.Object(
 export const screenshareSettingsSchema = Type.Object(
   {
     codec: Type.String(),
+    maxResolution: Type.String(),
     lowResMaxBitrate: Type.Number(),
     midResMaxBitrate: Type.Number(),
     highResMaxBitrate: Type.Number()
