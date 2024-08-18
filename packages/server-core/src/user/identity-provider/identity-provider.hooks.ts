@@ -82,7 +82,7 @@ async function checkTokenAuth(context: HookContext<IdentityProviderService>, use
 
       if (key.data.length > 0) {
         const user = await context.app.service(userPath).get(key.data[0].userId)
-        if (userId !== user.id) throw new BadRequest('Cannot make identity-providers on other users')
+        if (userId && userId !== user.id) throw new BadRequest('Cannot make identity-providers on other users')
         else return true
       }
     }
