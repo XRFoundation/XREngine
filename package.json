@@ -71,6 +71,7 @@
     "lint": "prettier --check \"packages/**/*.{ts,tsx}\"",
     "local": "npm run dev-docker && cross-env VITE_LOCAL_BUILD=true LOCAL=true concurrently -n agones,server,worldserver,mediaserver,client npm:dev-agones-silent \"cd packages/server && npm run start\" \"cd packages/instanceserver && npm run start\" \"cd packages/instanceserver && npm run start-channel\" \"cd packages/client && npm run local\"",
     "make-user-admin": "cross-env ts-node --swc scripts/make-user-admin.ts",
+    "generate-apple-client-secret": "cross-env ts-node --swc scripts/generate-apple-client-secret.ts",
     "migrate": "cd packages/server-core && npm run migrate",
     "migrate:rollback": "cd packages/server-core && npm run migrate:rollback",
     "migrate:unlock": "cd packages/server-core && npm run migrate:unlock",
