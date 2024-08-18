@@ -23,13 +23,13 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
+import { API } from '@etherealengine/common'
 import {
   FileBrowserContentType,
   fileBrowserUploadPath,
   staticResourcePath
 } from '@etherealengine/common/src/schema.type.module'
 import {
-  Engine,
   EntityUUID,
   UUIDComponent,
   UndefinedEntity,
@@ -129,9 +129,7 @@ const uploadThumbnail = async (src: string, projectName: string, staticResourceI
   thumbnailURL.search = ''
   thumbnailURL.hash = ''
   const _thumbnailKey = thumbnailURL.href.replace(config.client.fileServer + '/', '')
-  await Engine.instance.api
-    .service(staticResourcePath)
-    .patch(staticResourceId, { thumbnailKey: _thumbnailKey, thumbnailMode })
+  await API.instance.service(staticResourcePath).patch(staticResourceId, { thumbnailKey: _thumbnailKey, thumbnailMode })
 }
 
 const seenResources = new Set<string>()
@@ -160,7 +158,7 @@ export const FileThumbnailJobState = defineState({
 
         if (resource.type === 'thumbnail') {
           //set thumbnail's thumbnail as itself
-          Engine.instance.api.service(staticResourcePath).patch(resource.id, { thumbnailKey: resource.key })
+          API.instance.service(staticResourcePath).patch(resource.id, { thumbnailKey: resource.key })
           continue
         }
 

@@ -27,9 +27,8 @@ import { VRMLoaderPlugin } from '@pixiv/three-vrm'
 import { Group, WebGLRenderer } from 'three'
 
 import { isClient } from '@etherealengine/common/src/utils/getEnvironment'
-import { getState } from '@etherealengine/hyperflux'
-import { EngineState } from '@etherealengine/spatial/src/EngineState'
 
+import { Engine } from '@etherealengine/ecs'
 import { DRACOLoader } from '../loaders/gltf/DRACOLoader'
 import { CachedImageLoadExtension } from '../loaders/gltf/extensions/CachedImageLoadExtension'
 import EEECSImporterExtension from '../loaders/gltf/extensions/EEECSImporterExtension'
@@ -47,7 +46,7 @@ import { loadDRACODecoderNode, NodeDRACOLoader } from '../loaders/gltf/NodeDraco
 
 export const initializeKTX2Loader = (loader: GLTFLoader) => {
   const ktxLoader = new KTX2Loader()
-  ktxLoader.setTranscoderPath(getState(EngineState).publicPath + '/loader_decoders/basis/')
+  ktxLoader.setTranscoderPath(Engine.instance.store.publicPath + '/loader_decoders/basis/')
   const renderer = new WebGLRenderer()
   ktxLoader.detectSupport(renderer)
   renderer.dispose()
@@ -80,7 +79,7 @@ export const createGLTFLoader = (keepMaterials = false) => {
   if (isClient) {
     initializeKTX2Loader(loader)
     const dracoLoader = new DRACOLoader()
-    dracoLoader.setDecoderPath(getState(EngineState).publicPath + '/loader_decoders/')
+    dracoLoader.setDecoderPath(Engine.instance.store.publicPath + '/loader_decoders/')
     dracoLoader.setWorkerLimit(1)
     loader.setDRACOLoader(dracoLoader)
   } else {

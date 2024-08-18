@@ -23,9 +23,9 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
+import { API } from '@etherealengine/common'
 import multiLogger from '@etherealengine/common/src/logger'
 import { oembedPath, OembedType } from '@etherealengine/common/src/schema.type.module'
-import { Engine } from '@etherealengine/ecs/src/Engine'
 import { defineState, getMutableState } from '@etherealengine/hyperflux'
 
 import { NotificationService } from './NotificationService'
@@ -42,7 +42,7 @@ export const OEmbedState = defineState({
   fetchData: async (pathname: string, queryUrl: string) => {
     try {
       getMutableState(OEmbedState).merge({ oEmbed: undefined, pathname })
-      const oEmbed = (await Engine.instance.api.service(oembedPath).find({ query: { url: queryUrl } })) as OembedType
+      const oEmbed = (await API.instance.service(oembedPath).find({ query: { url: queryUrl } })) as OembedType
       getMutableState(OEmbedState).merge({ oEmbed, pathname })
     } catch (err) {
       logger.error(err)

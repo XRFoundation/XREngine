@@ -81,7 +81,7 @@ describe('CameraSystem', async () => {
       const peerID2 = 'peer id 2' as PeerID
       const CameraUUID = UUIDComponent.generateUUID()
 
-      Engine.instance.userID = userId
+      Engine.instance.store.userID = userId
       const network: Network = NetworkState.worldNetwork
 
       NetworkPeerFunctions.createPeer(network, peerID, 0, hostUserId, 0)

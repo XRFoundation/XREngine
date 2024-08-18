@@ -26,6 +26,7 @@ Ethereal Engine. All Rights Reserved.
 import { Paginated } from '@feathersjs/feathers'
 import { useEffect } from 'react'
 
+import { API } from '@etherealengine/common'
 import multiLogger from '@etherealengine/common/src/logger'
 import {
   builderInfoPath,
@@ -48,7 +49,6 @@ import {
   ProjectUpdateParams,
   UserID
 } from '@etherealengine/common/src/schema.type.module'
-import { Engine } from '@etherealengine/ecs/src/Engine'
 import { defineState, getMutableState, useHookstate } from '@etherealengine/hyperflux'
 
 import { NotificationService } from './NotificationService'
@@ -79,7 +79,7 @@ export const ProjectState = defineState({
 export const ProjectService = {
   fetchProjects: async () => {
     try {
-      const projects = (await Engine.instance.api.service(projectPath).find({
+      const projects = (await API.instance.service(projectPath).find({
         query: {
           action: 'admin',
           allowed: true
@@ -96,14 +96,14 @@ export const ProjectService = {
 
   // restricted to admin scope
   createProject: async (name: string, params?: ProjectUpdateParams) => {
-    const result = await Engine.instance.api.service(projectPath).create({ name }, params)
+    const result = await API.instance.service(projectPath).create({ name }, params)
     logger.info({ result }, 'Create project result')
     await ProjectService.fetchProjects()
   },
 
   // restricted to admin scope
   uploadProject: async (data: ProjectBuildUpdateItemType) => {
-    const result = await Engine.instance.api.service(projectPath).update('', {
+    const result = await API.instance.service(projectPath).update('', {
       sourceURL: data.sourceURL,
       destinationURL: data.destinationURL,
       name: data.name,
@@ -114,20 +114,20 @@ export const ProjectService = {
       updateSchedule: data.updateSchedule
     })
     logger.info({ result }, 'Upload project result')
-    await Engine.instance.api.service(projectInvalidatePath).patch(null, { projectName: data.name })
+    await API.instance.service(projectInvalidatePath).patch(null, { projectName: data.name })
     await ProjectService.fetchProjects()
   },
 
   // restricted to admin scope
   removeProject: async (id: string, params?: ProjectUpdateParams) => {
-    const result = await Engine.instance.api.service(projectPath).remove(id, params)
+    const result = await API.instance.service(projectPath).remove(id, params)
     logger.info({ result }, 'Remove project result')
     await ProjectService.fetchProjects()
   },
 
   // restricted to admin scope
   checkReloadStatus: async () => {
-    const result = await Engine.instance.api.service(projectBuildPath).find()
+    const result = await API.instance.service(projectBuildPath).find()
     logger.info({ result }, 'Check reload projects result')
     getMutableState(ProjectState).merge({
       rebuilding: result.running,
@@ -139,7 +139,7 @@ export const ProjectService = {
   // restricted to admin scope
   invalidateProjectCache: async (projectName: string) => {
     try {
-      await Engine.instance.api.service(projectInvalidatePath).patch(null, { projectName })
+      await API.instance.service(projectInvalidatePath).patch(null, { projectName })
       await ProjectService.fetchProjects()
     } catch (err) {
       logger.error(err, 'Error invalidating project cache.')
@@ -148,7 +148,7 @@ export const ProjectService = {
 
   setEnabled: async (id: string, enabled: boolean) => {
     try {
-      await Engine.instance.api.service(projectPath).patch(id, {
+      await API.instance.service(projectPath).patch(id, {
         enabled
       })
     } catch (err) {
@@ -159,7 +159,7 @@ export const ProjectService = {
 
   setVisibility: async (id: string, visibility: ProjectType['visibility']) => {
     try {
-      await Engine.instance.api.service(projectPath).patch(id, {
+      await API.instance.service(projectPath).patch(id, {
         visibility
       })
     } catch (err) {
@@ -170,7 +170,7 @@ export const ProjectService = {
 
   setRepositoryPath: async (id: string, url: string) => {
     try {
-      await Engine.instance.api.service(projectPath).patch(id, {
+      await API.instance.service(projectPath).patch(id, {
         repositoryPath: url
       })
     } catch (err) {
@@ -181,7 +181,7 @@ export const ProjectService = {
 
   pushProject: async (id: string) => {
     try {
-      await Engine.instance.api.service(projectGithubPushPath).patch(id, {})
+      await API.instance.service(projectGithubPushPath).patch(id, {})
     } catch (err) {
       logger.error('Error with project push', err)
       throw err
@@ -190,7 +190,7 @@ export const ProjectService = {
 
   createPermission: async (userInviteCode: InviteCode, projectId: string, type: string) => {
     try {
-      return Engine.instance.api.service(projectPermissionPath).create({
+      return API.instance.service(projectPermissionPath).create({
         inviteCode: userInviteCode,
         userId: '' as UserID,
         projectId: projectId,
@@ -204,7 +204,7 @@ export const ProjectService = {
 
   patchPermission: async (id: string, type: string) => {
     try {
-      return Engine.instance.api.service(projectPermissionPath).patch(id, {
+      return API.instance.service(projectPermissionPath).patch(id, {
         type: type
       })
     } catch (err) {
@@ -215,7 +215,7 @@ export const ProjectService = {
 
   removePermission: async (id: string) => {
     try {
-      return Engine.instance.api.service(projectPermissionPath).remove(id)
+      return API.instance.service(projectPermissionPath).remove(id)
     } catch (err) {
       logger.error('Error with removing project-permission', err)
       throw err
@@ -230,23 +230,23 @@ export const ProjectService = {
 
     useEffect(() => {
       // TODO #7254
-      // Engine.instance.api.service(projectBuildPath).on('patched', (params) => {})
+      // API.instance.service(projectBuildPath).on('patched', (params) => {})
 
       const projectPatchedListener = (params) => {
         getMutableState(ProjectState).updateNeeded.set(true)
       }
 
-      Engine.instance.api.service(projectPath).on('patched', projectPatchedListener)
+      API.instance.service(projectPath).on('patched', projectPatchedListener)
 
       return () => {
-        Engine.instance.api.service(projectPath).off('patched', projectPatchedListener)
+        API.instance.service(projectPath).off('patched', projectPatchedListener)
       }
     }, [])
   },
 
   fetchProjectBranches: async (url: string) => {
     try {
-      return (await Engine.instance.api.service(projectBranchesPath).get(url)).branches
+      return (await API.instance.service(projectBranchesPath).get(url)).branches
     } catch (err) {
       logger.error('Error with fetching tags for a project', err)
       throw err
@@ -255,7 +255,7 @@ export const ProjectService = {
 
   fetchProjectCommits: async (url: string, branchName: string) => {
     try {
-      const projectCommits = await Engine.instance.api.service(projectCommitsPath).get(url, {
+      const projectCommits = await API.instance.service(projectCommitsPath).get(url, {
         query: {
           sourceBranch: branchName
         }
@@ -270,7 +270,7 @@ export const ProjectService = {
 
   checkDestinationURLValid: async ({ url, inputProjectURL }: { url: string; inputProjectURL?: string }) => {
     try {
-      return Engine.instance.api.service(projectDestinationCheckPath).get(url, {
+      return API.instance.service(projectDestinationCheckPath).get(url, {
         query: {
           inputProjectURL
         }
@@ -283,7 +283,7 @@ export const ProjectService = {
 
   checkUnfetchedCommit: async ({ url, selectedSHA }: { url: string; selectedSHA?: string }) => {
     try {
-      return Engine.instance.api.service(projectCheckUnfetchedCommitPath).get(url, {
+      return API.instance.service(projectCheckUnfetchedCommitPath).get(url, {
         query: {
           selectedSHA
         }
@@ -306,7 +306,7 @@ export const ProjectService = {
     existingProject: boolean
   }) => {
     try {
-      return Engine.instance.api.service(projectCheckSourceDestinationMatchPath).find({
+      return API.instance.service(projectCheckSourceDestinationMatchPath).find({
         query: {
           sourceURL,
           selectedSHA,
@@ -322,7 +322,7 @@ export const ProjectService = {
 
   updateEngine: async (tag: string, updateProjects: boolean, projectsToUpdate: ProjectBuildUpdateItemType[]) => {
     try {
-      await Engine.instance.api.service(projectBuildPath).patch(tag, {
+      await API.instance.service(projectBuildPath).patch(tag, {
         updateProjects,
         projectsToUpdate
       })
@@ -334,7 +334,7 @@ export const ProjectService = {
 
   fetchBuilderTags: async () => {
     try {
-      const result = await Engine.instance.api.service(projectBuilderTagsPath).find()
+      const result = await API.instance.service(projectBuilderTagsPath).find()
       getMutableState(ProjectState).builderTags.set(result)
     } catch (err) {
       logger.error('Error with getting builder tags', err)
@@ -344,7 +344,7 @@ export const ProjectService = {
 
   getBuilderInfo: async () => {
     try {
-      const result = await Engine.instance.api.service(builderInfoPath).get()
+      const result = await API.instance.service(builderInfoPath).get()
       getMutableState(ProjectState).builderInfo.set(result)
     } catch (err) {
       logger.error('Error with getting engine info', err)
@@ -355,7 +355,7 @@ export const ProjectService = {
   refreshGithubRepoAccess: async () => {
     try {
       getMutableState(ProjectState).refreshingGithubRepoAccess.set(true)
-      await Engine.instance.api.service(githubRepoAccessRefreshPath).find()
+      await API.instance.service(githubRepoAccessRefreshPath).find()
       getMutableState(ProjectState).refreshingGithubRepoAccess.set(false)
       await ProjectService.fetchProjects()
     } catch (err) {

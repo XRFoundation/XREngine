@@ -29,9 +29,10 @@ import { afterEach } from 'mocha'
 import { useEffect } from 'react'
 
 import { AvatarID, UserName, userPath } from '@etherealengine/common/src/schema.type.module'
-import { Engine, destroyEngine } from '@etherealengine/ecs/src/Engine'
+import { destroyEngine } from '@etherealengine/ecs/src/Engine'
 import { createState } from '@etherealengine/hyperflux'
 
+import { API } from '@etherealengine/common'
 import { createEngine } from '@etherealengine/ecs/src/Engine'
 import { EventDispatcher } from '../classes/EventDispatcher'
 import { useFind, useGet, useMutation } from './FeathersHooks'
@@ -46,7 +47,7 @@ describe('FeathersHooks', () => {
       { id: '2', name: 'Jane' as UserName }
     ]
     eventDispatcher = new EventDispatcher()
-    ;(Engine.instance.api as any) = {
+    ;(API.instance as any) = {
       service: () => {
         return {
           find: () => {
@@ -287,7 +288,7 @@ describe('FeathersHooks', () => {
           rerender()
         })
         await act(() => {
-          Engine.instance.api
+          API.instance
             .service(userPath)
             .create({ name: 'Jack' as UserName, avatarId: '' as AvatarID, isGuest: true, scopes: [] })
         })
@@ -310,7 +311,7 @@ describe('FeathersHooks', () => {
           rerender()
         })
         await act(() => {
-          Engine.instance.api
+          API.instance
             .service(userPath)
             .create({ name: 'Jack' as UserName, avatarId: '' as AvatarID, isGuest: true, scopes: [] })
         })
@@ -330,7 +331,7 @@ describe('FeathersHooks', () => {
           rerender()
         })
         await act(() => {
-          Engine.instance.api.service(userPath).update('1', { name: 'Jack' as UserName })
+          API.instance.service(userPath).update('1', { name: 'Jack' as UserName })
         })
         await act(() => {
           rerender()
@@ -350,7 +351,7 @@ describe('FeathersHooks', () => {
           rerender()
         })
         await act(() => {
-          Engine.instance.api.service(userPath).update('1', { name: 'Jack' as UserName })
+          API.instance.service(userPath).update('1', { name: 'Jack' as UserName })
         })
         await act(() => {
           rerender()
@@ -368,7 +369,7 @@ describe('FeathersHooks', () => {
           rerender()
         })
         await act(() => {
-          Engine.instance.api.service(userPath).patch('1', { name: 'Jack' as UserName })
+          API.instance.service(userPath).patch('1', { name: 'Jack' as UserName })
         })
         await act(() => {
           rerender()
@@ -388,7 +389,7 @@ describe('FeathersHooks', () => {
           rerender()
         })
         await act(() => {
-          Engine.instance.api.service(userPath).patch('1', { name: 'Jack' as UserName })
+          API.instance.service(userPath).patch('1', { name: 'Jack' as UserName })
         })
         await act(() => {
           rerender()
@@ -406,7 +407,7 @@ describe('FeathersHooks', () => {
           rerender()
         })
         await act(() => {
-          Engine.instance.api.service(userPath).remove('1')
+          API.instance.service(userPath).remove('1')
         })
         await act(() => {
           rerender()
@@ -426,7 +427,7 @@ describe('FeathersHooks', () => {
           rerender()
         })
         await act(() => {
-          Engine.instance.api.service(userPath).remove('1')
+          API.instance.service(userPath).remove('1')
         })
         await act(() => {
           rerender()

@@ -80,7 +80,7 @@ describe('SpectateSystem', async () => {
       const peerID3 = 'peer id 3' as PeerID
       const spectatorID = 'spectator id' as UserID
 
-      Engine.instance.userID = userId
+      Engine.instance.store.userID = userId
       const network: Network = NetworkState.worldNetwork
 
       NetworkPeerFunctions.createPeer(network, peerID, 0, hostUserId, 0)
@@ -115,7 +115,7 @@ describe('SpectateSystem', async () => {
       const peerID3 = 'peer id 3' as PeerID
       const spectatorID = 'spectator id' as UserID
 
-      Engine.instance.userID = userId
+      Engine.instance.store.userID = userId
       const network: Network = NetworkState.worldNetwork
 
       NetworkPeerFunctions.createPeer(network, peerID, 0, hostUserId, 0)

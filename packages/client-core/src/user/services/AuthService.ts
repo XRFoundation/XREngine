@@ -29,6 +29,7 @@ import i18n from 'i18next'
 import { useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
+import { API } from '@etherealengine/common/src/API'
 import config, { validateEmail, validatePhoneNumber } from '@etherealengine/common/src/config'
 import { AuthUserSeed, resolveAuthUser } from '@etherealengine/common/src/interfaces/AuthUser'
 import multiLogger from '@etherealengine/common/src/logger'
@@ -57,15 +58,14 @@ import {
   userPath,
   userSettingPath
 } from '@etherealengine/common/src/schema.type.module'
-import { Engine } from '@etherealengine/ecs/src/Engine'
 import {
+  HyperFlux,
   defineState,
   getMutableState,
   getState,
   syncStateWithLocalStorage,
   useHookstate
 } from '@etherealengine/hyperflux'
-import { API } from '../../API'
 import { NotificationService } from '../../common/services/NotificationService'
 
 export const logger = multiLogger.child({ component: 'client-core:AuthService' })
@@ -170,16 +170,16 @@ export interface LinkedInLoginForm {
  */
 async function _resetToGuestToken(options = { reset: true }) {
   if (options.reset) {
-    await API.instance.client.authentication.reset()
+    await API.instance.authentication.reset()
   }
-  const newProvider = await Engine.instance.api.service(identityProviderPath).create({
+  const newProvider = await API.instance.service(identityProviderPath).create({
     type: 'guest',
     token: uuidv4(),
     userId: '' as UserID
   })
   const accessToken = newProvider.accessToken!
   console.log(`Created new guest accessToken: ${accessToken}`)
-  await API.instance.client.authentication.setAccessToken(accessToken as string)
+  await API.instance.authentication.setAccessToken(accessToken as string)
   return accessToken
 }
 
@@ -195,22 +195,22 @@ export const AuthService = {
       const accessToken = !forceClientAuthReset && authState?.authUser?.accessToken?.value
 
       if (forceClientAuthReset) {
-        await API.instance.client.authentication.reset()
+        await API.instance.authentication.reset()
       }
       if (accessToken) {
-        await API.instance.client.authentication.setAccessToken(accessToken as string)
+        await API.instance.authentication.setAccessToken(accessToken as string)
       } else {
         await _resetToGuestToken({ reset: false })
       }
 
       let res: AuthenticationResult
       try {
-        res = await API.instance.client.reAuthenticate()
+        res = await API.instance.reAuthenticate()
       } catch (err) {
         if (err.className === 'not-found' || (err.className === 'not-authenticated' && err.message === 'jwt expired')) {
           authState.merge({ isLoggedIn: false, user: UserSeed, authUser: AuthUserSeed })
           await _resetToGuestToken()
-          res = await API.instance.client.reAuthenticate()
+          res = await API.instance.reAuthenticate()
         } else {
           logger.error(err, 'Error re-authenticating')
           throw err
@@ -222,7 +222,7 @@ export const AuthService = {
         if (!identityProvider?.id) {
           authState.merge({ isLoggedIn: false, user: UserSeed, authUser: AuthUserSeed })
           await _resetToGuestToken()
-          res = await API.instance.client.reAuthenticate()
+          res = await API.instance.reAuthenticate()
         }
         const authUser = resolveAuthUser(res)
         // authUser is now { accessToken, authentication, identityProvider }
@@ -243,7 +243,7 @@ export const AuthService = {
 
   async loadUserData(userId: UserID) {
     try {
-      const client = API.instance.client
+      const client = API.instance
       const user = await client.service(userPath).get(userId)
       if (!user.userSetting) {
         const settingsRes = (await client
@@ -278,7 +278,7 @@ export const AuthService = {
     authState.merge({ isProcessing: true, error: '' })
 
     try {
-      const authenticationResult = await API.instance.client.authenticate({
+      const authenticationResult = await API.instance.authenticate({
         strategy: 'local',
         email: form.email,
         password: form.password
@@ -378,24 +378,24 @@ export const AuthService = {
   },
 
   async removeUserOAuth(service: string) {
-    const ipResult = (await Engine.instance.api.service(identityProviderPath).find()) as Paginated<IdentityProviderType>
+    const ipResult = (await API.instance.service(identityProviderPath).find()) as Paginated<IdentityProviderType>
     const ipToRemove = ipResult.data.find((ip) => ip.type === service)
     if (ipToRemove) {
       if (ipResult.total === 1) {
         NotificationService.dispatchNotify('You can not remove your last login method.', { variant: 'warning' })
       } else {
         const otherIp = ipResult.data.find((ip) => ip.type !== service)
-        const newTokenResult = await Engine.instance.api.service(generateTokenPath).create({
+        const newTokenResult = await API.instance.service(generateTokenPath).create({
           type: otherIp!.type,
           token: otherIp!.token
         })
 
         if (newTokenResult?.token) {
           getMutableState(AuthState).merge({ isProcessing: true, error: '' })
-          await API.instance.client.authentication.setAccessToken(newTokenResult.token)
-          const res = await API.instance.client.reAuthenticate(true)
+          await API.instance.authentication.setAccessToken(newTokenResult.token)
+          const res = await API.instance.reAuthenticate(true)
           const authUser = resolveAuthUser(res)
-          await Engine.instance.api.service(identityProviderPath).remove(ipToRemove.id)
+          await API.instance.service(identityProviderPath).remove(ipToRemove.id)
           const authState = getMutableState(AuthState)
           authState.merge({ authUser })
           await AuthService.loadUserData(authUser.identityProvider.userId)
@@ -409,8 +409,8 @@ export const AuthService = {
     const authState = getMutableState(AuthState)
     authState.merge({ isProcessing: true, error: '' })
     try {
-      await API.instance.client.authentication.setAccessToken(accessToken as string)
-      const res = await API.instance.client.authenticate({
+      await API.instance.authentication.setAccessToken(accessToken as string)
+      const res = await API.instance.authenticate({
         strategy: 'jwt',
         accessToken
       })
@@ -446,7 +446,7 @@ export const AuthService = {
 
   async loginUserMagicLink(token, redirectSuccess, redirectError) {
     try {
-      const res = await Engine.instance.api.service(loginPath).get(token)
+      const res = await API.instance.service(loginPath).get(token)
       await AuthService.loginUserByJwt(res.token!, '/', '/')
     } catch (err) {
       NotificationService.dispatchNotify(err.message, { variant: 'error' })
@@ -459,7 +459,7 @@ export const AuthService = {
     const authState = getMutableState(AuthState)
     authState.merge({ isProcessing: true, error: '' })
     try {
-      await API.instance.client.logout()
+      await API.instance.logout()
       authState.merge({ isLoggedIn: false, user: UserSeed, authUser: AuthUserSeed })
     } catch (_) {
       authState.merge({ isLoggedIn: false, user: UserSeed, authUser: AuthUserSeed })
@@ -473,7 +473,7 @@ export const AuthService = {
     const authState = getMutableState(AuthState)
     authState.merge({ isProcessing: true, error: '' })
     try {
-      const identityProvider: any = await Engine.instance.api.service(identityProviderPath).create({
+      const identityProvider: any = await API.instance.service(identityProviderPath).create({
         token: form.email,
         type: 'password',
         userId: '' as UserID
@@ -548,7 +548,7 @@ export const AuthService = {
     }
 
     try {
-      await Engine.instance.api
+      await API.instance
         .service(magicLinkPath)
         .create({ type, [paramName]: emailPhone, accessToken: storedToken, redirectUrl })
       const message = {
@@ -572,7 +572,7 @@ export const AuthService = {
     authState.merge({ isProcessing: true, error: '' })
 
     try {
-      const identityProvider = await Engine.instance.api.service(identityProviderPath).create({
+      const identityProvider = await API.instance.service(identityProviderPath).create({
         token: form.email,
         type: 'password',
         userId: '' as UserID
@@ -590,7 +590,7 @@ export const AuthService = {
     const authState = getMutableState(AuthState)
     authState.merge({ isProcessing: true, error: '' })
     try {
-      const identityProvider = (await Engine.instance.api.service(magicLinkPath).create({
+      const identityProvider = (await API.instance.service(magicLinkPath).create({
         email,
         type: 'email',
         userId
@@ -618,7 +618,7 @@ export const AuthService = {
     }
 
     try {
-      const identityProvider = (await Engine.instance.api.service(magicLinkPath).create({
+      const identityProvider = (await API.instance.service(magicLinkPath).create({
         mobile: sendPhone,
         type: 'sms',
         userId
@@ -644,7 +644,7 @@ export const AuthService = {
   async removeConnection(identityProviderId: number, userId: UserID) {
     getMutableState(AuthState).merge({ isProcessing: true, error: '' })
     try {
-      await Engine.instance.api.service(identityProviderPath).remove(identityProviderId)
+      await API.instance.service(identityProviderPath).remove(identityProviderId)
       return AuthService.loadUserData(userId)
     } catch (err) {
       NotificationService.dispatchNotify(err.message, { variant: 'error' })
@@ -658,30 +658,30 @@ export const AuthService = {
   },
 
   async updateUserSettings(id: UserSettingID, data: UserSettingPatch) {
-    const response = await Engine.instance.api.service(userSettingPath).patch(id, data)
+    const response = await API.instance.service(userSettingPath).patch(id, data)
     getMutableState(AuthState).user.userSetting.merge(response)
   },
 
   async removeUser(userId: UserID) {
-    await Engine.instance.api.service(userPath).remove(userId)
+    await API.instance.service(userPath).remove(userId)
     AuthService.logoutUser()
   },
 
   async updateApiKey() {
-    const userApiKey = (await Engine.instance.api.service(userApiKeyPath).find()) as Paginated<UserApiKeyType>
+    const userApiKey = (await API.instance.service(userApiKeyPath).find()) as Paginated<UserApiKeyType>
 
     let apiKey: UserApiKeyType | undefined
     if (userApiKey.data.length > 0) {
-      apiKey = await Engine.instance.api.service(userApiKeyPath).patch(userApiKey.data[0].id, {})
+      apiKey = await API.instance.service(userApiKeyPath).patch(userApiKey.data[0].id, {})
     } else {
-      apiKey = await Engine.instance.api.service(userApiKeyPath).create({})
+      apiKey = await API.instance.service(userApiKeyPath).create({})
     }
 
     getMutableState(AuthState).user.merge({ apiKey })
   },
 
   async createLoginToken() {
-    return Engine.instance.api.service(loginTokenPath).create({})
+    return API.instance.service(loginTokenPath).create({})
   },
 
   useAPIListeners: () => {
@@ -706,17 +706,17 @@ export const AuthService = {
         const selfUser = getMutableState(AuthState).user
 
         if (selfUser.id.value === userAvatar.userId) {
-          const user = await Engine.instance.api.service(userPath).get(userAvatar.userId)
+          const user = await API.instance.service(userPath).get(userAvatar.userId)
           getMutableState(AuthState).user.merge(user)
         }
       }
 
-      Engine.instance.api.service(userPath).on('patched', userPatchedListener)
-      Engine.instance.api.service(userAvatarPath).on('patched', userAvatarPatchedListener)
+      API.instance.service(userPath).on('patched', userPatchedListener)
+      API.instance.service(userAvatarPath).on('patched', userAvatarPatchedListener)
 
       return () => {
-        Engine.instance.api.service(userPath).off('patched', userPatchedListener)
-        Engine.instance.api.service(userAvatarPath).off('patched', userAvatarPatchedListener)
+        API.instance.service(userPath).off('patched', userPatchedListener)
+        API.instance.service(userAvatarPath).off('patched', userAvatarPatchedListener)
       }
     }, [])
   }
@@ -772,7 +772,7 @@ export const useAuthenticated = () => {
   }, [])
 
   useEffect(() => {
-    Engine.instance.userID = authState.user.id.value
+    HyperFlux.store.userID = authState.user.id.value
   }, [authState.user.id])
 
   return authState.isLoggedIn.value

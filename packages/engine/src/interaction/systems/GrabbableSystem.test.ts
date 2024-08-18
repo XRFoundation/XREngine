@@ -131,7 +131,7 @@ describe.skip('EquippableSystem Integration Tests', () => {
     NetworkPeerFunctions.createPeer(NetworkState.worldNetwork, hostUserId, hostIndex, hostUserId, hostIndex)
 
     const userId = 'user id' as UserID
-    Engine.instance.userID = userId
+    Engine.instance.store.userID = userId
 
     const grabbableEntity = createEntity()
 

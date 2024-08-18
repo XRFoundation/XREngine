@@ -26,6 +26,8 @@ Ethereal Engine. All Rights Reserved.
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
+import '../../engine'
+
 import { NotificationService } from '@etherealengine/client-core/src/common/services/NotificationService'
 import { useNetwork } from '@etherealengine/client-core/src/components/World/EngineHooks'
 import { LocationService, LocationState } from '@etherealengine/client-core/src/social/services/LocationService'
@@ -42,6 +44,7 @@ import { getMutableComponent, hasComponent, useQuery } from '@etherealengine/ecs
 
 import '@etherealengine/engine/src/EngineModule'
 
+import Debug from '@etherealengine/client-core/src/components/Debug'
 import { AvatarControllerComponent } from '@etherealengine/engine/src/avatar/components/AvatarControllerComponent'
 import { RigidBodyComponent } from '@etherealengine/spatial/src/physics/components/RigidBodyComponent'
 
@@ -84,7 +87,12 @@ export const CaptureLocation = () => {
 
   AuthService.useAPIListeners()
 
-  return <CaptureUI />
+  return (
+    <>
+      <CaptureUI />
+      <Debug />
+    </>
+  )
 }
 
 export default CaptureLocation

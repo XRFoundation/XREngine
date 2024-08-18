@@ -29,6 +29,7 @@ import assert from 'assert'
 import { ChildProcess } from 'child_process'
 import { v4 as uuidv4 } from 'uuid'
 
+import { API } from '@etherealengine/common'
 import {
   identityProviderPath,
   InstanceData,
@@ -37,7 +38,7 @@ import {
   RoomCode,
   UserID
 } from '@etherealengine/common/src/schema.type.module'
-import { destroyEngine, Engine } from '@etherealengine/ecs/src/Engine'
+import { destroyEngine } from '@etherealengine/ecs/src/Engine'
 import { getState } from '@etherealengine/hyperflux'
 import { NetworkState } from '@etherealengine/network'
 import { Application } from '@etherealengine/server-core/declarations'
@@ -66,7 +67,7 @@ describe('InstanceLoad', () => {
   })
 
   it('should load location', async () => {
-    const app = Engine.instance.api as Application
+    const app = API.instance as Application
     const loadLocation = onConnection(app)
 
     const type = 'guest'

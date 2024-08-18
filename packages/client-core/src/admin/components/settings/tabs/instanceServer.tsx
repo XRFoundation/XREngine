@@ -27,8 +27,8 @@ import React, { forwardRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { HiMinus, HiPlusSmall } from 'react-icons/hi2'
 
+import { API } from '@etherealengine/common'
 import { instanceServerSettingPath, InstanceServerSettingType } from '@etherealengine/common/src/schema.type.module'
-import { Engine } from '@etherealengine/ecs'
 import { NO_PROXY, State, useHookstate } from '@etherealengine/hyperflux'
 import { useFind } from '@etherealengine/spatial/src/common/functions/FeathersHooks'
 import PasswordInput from '@etherealengine/ui/src/components/tailwind/PasswordInput'
@@ -79,7 +79,7 @@ const InstanceServerTab = forwardRef(({ open }: { open: boolean }, ref: React.Mu
       //
     }
 
-    Engine.instance.api
+    API.instance
       .service(instanceServerSettingPath)
       .patch(id, newSettings)
       .then(() => {

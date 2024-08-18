@@ -27,9 +27,9 @@ import { AudioLoader } from 'three'
 
 import { getState } from '@etherealengine/hyperflux'
 import { isAbsolutePath } from '@etherealengine/spatial/src/common/functions/isAbsolutePath'
-import { EngineState } from '@etherealengine/spatial/src/EngineState'
 
 import { AssetExt, AssetType, FileToAssetExt, FileToAssetType } from '@etherealengine/common/src/constants/AssetType'
+import { Engine } from '@etherealengine/ecs'
 import loadVideoTexture from '../../scene/materials/functions/LoadVideoTexture'
 import { FileLoader } from '../loaders/base/FileLoader'
 import { DDSLoader } from '../loaders/dds/DDSLoader'
@@ -90,7 +90,7 @@ export const getLoader = (assetType: AssetExt) => {
   }
 }
 
-const getAbsolutePath = (url) => (isAbsolutePath(url) ? url : getState(EngineState).publicPath + url)
+const getAbsolutePath = (url) => (isAbsolutePath(url) ? url : Engine.instance.store.publicPath + url)
 
 const loadAsset = async <T>(
   url: string,

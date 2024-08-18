@@ -23,12 +23,10 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import { Engine } from '@etherealengine/ecs/src/Engine'
-
-import { FeathersClient } from '../API'
+import { API } from '@etherealengine/common'
 
 async function waitForClientAuthenticated(): Promise<void> {
-  const api = Engine.instance.api as FeathersClient
+  const api = API.instance // as FeathersClient
   console.log('Client authenticated?', api.authentication?.authenticated)
   if (api.authentication?.authenticated === true) return
   else

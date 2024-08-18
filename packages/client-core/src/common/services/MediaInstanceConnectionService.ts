@@ -25,9 +25,9 @@ Ethereal Engine. All Rights Reserved.
 
 import { useEffect } from 'react'
 
+import { API } from '@etherealengine/common'
 import multiLogger from '@etherealengine/common/src/logger'
 import { ChannelID, InstanceID, instanceProvisionPath, RoomCode } from '@etherealengine/common/src/schema.type.module'
-import { Engine } from '@etherealengine/ecs/src/Engine'
 import { defineState, getMutableState, getState, Identifiable, State, useState } from '@etherealengine/hyperflux'
 import { NetworkState } from '@etherealengine/network'
 
@@ -70,7 +70,7 @@ export const MediaInstanceConnectionService = {
   provisionServer: async (channelID: ChannelID, createPrivateRoom = false) => {
     logger.info(`Provision Media Server, channelId: "${channelID}".`)
     const token = getState(AuthState).authUser.accessToken
-    const provisionResult = await Engine.instance.api.service(instanceProvisionPath).find({
+    const provisionResult = await API.instance.service(instanceProvisionPath).find({
       query: {
         channelId: channelID,
         token,
@@ -103,9 +103,9 @@ export const MediaInstanceConnectionService = {
           })
         }
       }
-      Engine.instance.api.service(instanceProvisionPath).on('created', listener)
+      API.instance.service(instanceProvisionPath).on('created', listener)
       return () => {
-        Engine.instance.api.service(instanceProvisionPath).off('created', listener)
+        API.instance.service(instanceProvisionPath).off('created', listener)
       }
     }, [])
   }

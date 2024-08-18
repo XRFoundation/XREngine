@@ -28,8 +28,8 @@ import i18n from 'i18next'
 import React, { lazy, useEffect, useLayoutEffect } from 'react'
 import { BrowserRouterProps as NativeBrowserRouterProps, Router, useSearchParams } from 'react-router-dom'
 
+import { API } from '@etherealengine/common'
 import { routePath, RouteType } from '@etherealengine/common/src/schema.type.module'
-import { Engine } from '@etherealengine/ecs/src/Engine'
 import { defineState, getMutableState, NO_PROXY, startReactor, useHookstate } from '@etherealengine/hyperflux'
 import { loadRoute } from '@etherealengine/projects/loadRoute'
 
@@ -139,9 +139,7 @@ export type CustomRoute = {
  * getCustomRoutes used to get the routes created by the user.
  */
 export const getCustomRoutes = async (): Promise<CustomRoute[]> => {
-  const routes = (await Engine.instance.api
-    .service(routePath)
-    .find({ query: { paginate: false } })) as any as RouteType[]
+  const routes = (await API.instance.service(routePath).find({ query: { paginate: false } })) as any as RouteType[]
 
   const elements: CustomRoute[] = []
 

@@ -81,7 +81,7 @@ const decorators = [
     }, [selfUser, projectState.updateNeeded.value])
 
     useEffect(() => {
-      Engine.instance.userID = selfUser.id.value
+      Engine.instance.store.userID = selfUser.id.value
     }, [selfUser.id])
 
     useEffect(() => {

@@ -545,7 +545,7 @@ describe('DataReader', () => {
     const networkId = 5678 as NetworkId
     const userID = 'user id' as UserID
     const peerID = 'peer id' as PeerID
-    Engine.instance.userID = userID
+    Engine.instance.store.userID = userID
     const userIndex = 0
     const peerIndex = 0
 
@@ -624,7 +624,7 @@ describe('DataReader', () => {
     const networkId = 5678 as NetworkId
     const userID = 'user Id' as UserID
     const peerID = 'peer ID' as PeerID
-    Engine.instance.userID = userID
+    Engine.instance.store.userID = userID
     const userIndex = 0
     const peerIndex = 0
 
@@ -691,7 +691,7 @@ describe('DataReader', () => {
     const peerID = 'peer id' as PeerID
     const peerID2 = 'peer id 2' as PeerID
 
-    Engine.instance.userID = userID
+    Engine.instance.store.userID = userID
     const userIndex = 0
     const peerIndex = 0
     const peer2Index = 1
@@ -850,7 +850,7 @@ describe('DataReader', () => {
     const write = createDataWriter()
     const network = NetworkState.worldNetwork as Network
 
-    Engine.instance.userID = 'userId' as UserID
+    Engine.instance.store.userID = 'userId' as UserID
     const userId = Engine.instance.userID
     const peerID = Engine.instance.store.peerID
     const userIndex = 0

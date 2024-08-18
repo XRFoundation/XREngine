@@ -37,7 +37,7 @@ import Select from '@etherealengine/ui/src/primitives/tailwind/Select'
 import Text from '@etherealengine/ui/src/primitives/tailwind/Text'
 import Toggle from '@etherealengine/ui/src/primitives/tailwind/Toggle'
 
-import { Engine } from '@etherealengine/ecs'
+import { API } from '@etherealengine/common'
 import { useFind } from '@etherealengine/spatial/src/common/functions/FeathersHooks'
 
 const ClientTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableRefObject<HTMLDivElement>) => {
@@ -104,7 +104,7 @@ const ClientTab = forwardRef(({ open }: { open: boolean }, ref: React.MutableRef
       updatedAt: undefined!
     } as any as ClientSettingType
 
-    Engine.instance.api
+    API.instance
       .service(clientSettingPath)
       .patch(id, newSettings)
       .then(() => {

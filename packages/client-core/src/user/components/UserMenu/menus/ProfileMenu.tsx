@@ -58,7 +58,6 @@ import FormControlLabel from '@etherealengine/ui/src/primitives/mui/FormControlL
 import Icon from '@etherealengine/ui/src/primitives/mui/Icon'
 import IconButton from '@etherealengine/ui/src/primitives/mui/IconButton'
 
-import { Engine } from '@etherealengine/ecs'
 import Grid from '@etherealengine/ui/src/primitives/mui/Grid'
 import { initialAuthState, initialOAuthConnectedState } from '../../../../common/initialAuthState'
 import { NotificationService } from '../../../../common/services/NotificationService'
@@ -117,7 +116,7 @@ const ProfileMenu = ({ hideLogin, onClose, isPopover }: Props): JSX.Element => {
 
   useEffect(() => {
     if (!originallyAcceptedTOS.value && checked18OrOver.value) {
-      Engine.instance.api
+      API.instance
         .service(userPath)
         .patch(userId, { acceptedTOS: true })
         .then(() => {

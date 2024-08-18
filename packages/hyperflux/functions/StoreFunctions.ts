@@ -26,6 +26,7 @@ Ethereal Engine. All Rights Reserved.
 import { State } from '@hookstate/core'
 import { v4 as uuidv4 } from 'uuid'
 
+import { UserID } from '@etherealengine/common/src/schema.type.module'
 import { PeerID } from '@etherealengine/hyperflux'
 
 import { ActionQueueHandle, ActionQueueInstance, ResolvedActionType, Topic } from './ActionFunctions'
@@ -33,6 +34,11 @@ import { ReactorReconciler, ReactorRoot } from './ReactorFunctions'
 
 export type StringLiteral<T> = T extends string ? (string extends T ? never : T) : never
 export interface HyperStore {
+  /**
+   * @todo temporarily moved public path from EngineState to here to treeshake properly. Will be moved in a further restructuring.
+   * An empty share link will default to the current URL, plus any modifiers (such as spectate mode)
+   */
+  publicPath: string
   /**
    * The topic to dispatch to when none are supplied
    */
@@ -45,6 +51,10 @@ export interface HyperStore {
    * The agent id
    */
   peerID: PeerID
+  /**
+   * The uuid of the logged-in user
+   */
+  userID: UserID
   /**
    * A function which returns the current dispatch time (units are arbitrary)
    */
@@ -100,16 +110,19 @@ export class HyperFlux {
 }
 
 export function createHyperStore(options: {
-  getDispatchTime: () => number
+  publicPath: string
+  getDispatchTime?: () => number
   defaultDispatchDelay?: () => number
   getCurrentReactorRoot?: () => ReactorRoot | undefined
 }) {
   const store: HyperStore = {
+    publicPath: options.publicPath,
     defaultTopic: 'default' as Topic,
     forwardingTopics: new Set<Topic>(),
-    getDispatchTime: options.getDispatchTime,
+    getDispatchTime: options.getDispatchTime ?? (() => 0),
     defaultDispatchDelay: options.defaultDispatchDelay ?? (() => 0),
     getCurrentReactorRoot: options.getCurrentReactorRoot ?? (() => undefined),
+    userID: '' as UserID,
     peerID: uuidv4() as PeerID,
     stateMap: {},
     stateReactors: {},

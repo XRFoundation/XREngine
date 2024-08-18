@@ -38,11 +38,11 @@ import cors from 'koa-cors'
 import helmet from 'koa-helmet'
 import healthcheck from 'koa-simple-healthcheck'
 
+import { API } from '@etherealengine/common'
 import { pipeLogs } from '@etherealengine/common/src/logger'
 import { pipe } from '@etherealengine/common/src/utils/pipe'
-import { Engine, createEngine } from '@etherealengine/ecs/src/Engine'
-import { getMutableState } from '@etherealengine/hyperflux'
-import { EngineState } from '@etherealengine/spatial/src/EngineState'
+import { createEngine } from '@etherealengine/ecs/src/Engine'
+import { createHyperStore, getMutableState } from '@etherealengine/hyperflux'
 
 import { Application } from '../declarations'
 import { logger } from './ServerLogger'
@@ -174,6 +174,7 @@ export const createFeathersKoaApp = (
   serverMode: ServerTypeMode = ServerMode.API,
   configurationPipe = serverPipe
 ): Application => {
+  createHyperStore({ publicPath: config.client.dist })
   createEngine()
 
   const serverState = getMutableState(ServerState)
@@ -185,10 +186,8 @@ export const createFeathersKoaApp = (
     createIPFSStorageProvider()
   }
 
-  getMutableState(EngineState).publicPath.set(config.client.dist)
-
   const app = koa(feathers()) as Application
-  Engine.instance.api = app
+  API.instance = app
 
   app.set('nextReadyEmitter', new EventEmitter())
 
@@ -260,7 +259,7 @@ export const createFeathersKoaApp = (
     }
   })
 
-  pipeLogs(Engine.instance.api)
+  pipeLogs(API.instance)
 
   return app
 }

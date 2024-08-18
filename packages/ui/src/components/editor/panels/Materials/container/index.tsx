@@ -27,9 +27,10 @@ import React, { useEffect } from 'react'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList } from 'react-window'
 
+import { API } from '@etherealengine/common'
 import { staticResourcePath } from '@etherealengine/common/src/schema.type.module'
 import { pathJoin } from '@etherealengine/common/src/utils/miscUtils'
-import { Engine, EntityUUID, getComponent, getOptionalComponent, useQuery, UUIDComponent } from '@etherealengine/ecs'
+import { EntityUUID, getComponent, getOptionalComponent, useQuery, UUIDComponent } from '@etherealengine/ecs'
 import { uploadProjectFiles } from '@etherealengine/editor/src/functions/assetFunctions'
 import { EditorState } from '@etherealengine/editor/src/services/EditorServices'
 import { ImportSettingsState } from '@etherealengine/editor/src/services/ImportSettingsState'
@@ -140,7 +141,7 @@ export default function MaterialLibraryPanel() {
               )
               const adjustedLibraryName = libraryName.length > 0 ? libraryName.substring(1) : ''
               const key = `projects/${projectName}${importSettings.importFolder}${adjustedLibraryName}`
-              const resources = await Engine.instance.api.service(staticResourcePath).find({
+              const resources = await API.instance.service(staticResourcePath).find({
                 query: { key: key }
               })
               if (resources.data.length === 0) {
@@ -148,9 +149,7 @@ export default function MaterialLibraryPanel() {
               }
               const resource = resources.data[0]
               const tags = ['Material']
-              await Engine.instance.api
-                .service(staticResourcePath)
-                .patch(resource.id, { tags: tags, project: projectName })
+              await API.instance.service(staticResourcePath).patch(resource.id, { tags: tags, project: projectName })
               console.log('exported material data to ', ...urls)
             }}
           >

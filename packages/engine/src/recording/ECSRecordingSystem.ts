@@ -27,6 +27,7 @@ import { decode, encode } from 'msgpackr'
 import { PassThrough } from 'stream'
 import matches, { Validator } from 'ts-matches'
 
+import { API } from '@etherealengine/common'
 import multiLogger from '@etherealengine/common/src/logger'
 import {
   RecordingID,
@@ -189,7 +190,7 @@ export const RecordingState = defineState({
         if (peerSchema.length) schema.peers[peerID] = peerSchema
       })
 
-      const recording = await Engine.instance.api.service(recordingPath).create({ schema: schema })
+      const recording = await API.instance.service(recordingPath).create({ schema: schema })
 
       if (recording.id) RecordingState.startRecording({ recordingID: recording.id })
     } catch (err) {
@@ -363,7 +364,7 @@ export const dispatchError = (error: string, targetPeer: PeerID, topic: Topic) =
 }
 
 export const onStartRecording = async (action: ReturnType<typeof ECSRecordingActions.startRecording>) => {
-  const api = Engine.instance.api
+  const api = API.instance
 
   const recording = await api.service(recordingPath).get(action.recordingID)
   if (!recording) return dispatchError('Recording not found', action.$peer, action.$topic)
@@ -488,7 +489,7 @@ export const onStartRecording = async (action: ReturnType<typeof ECSRecordingAct
 }
 
 export const onStopRecording = async (action: ReturnType<typeof ECSRecordingActions.stopRecording>) => {
-  const api = Engine.instance.api
+  const api = API.instance
 
   const activeRecording = activeRecordings.get(action.recordingID)
   if (!activeRecording) return dispatchError('Recording not found', action.$peer, action.$topic)
@@ -534,7 +535,7 @@ export const onStopRecording = async (action: ReturnType<typeof ECSRecordingActi
 }
 
 export const onStartPlayback = async (action: ReturnType<typeof ECSRecordingActions.startPlayback>) => {
-  const api = Engine.instance.api
+  const api = API.instance
 
   const recording = await api.service(recordingPath).get(action.recordingID, { isInternal: true })
 
@@ -685,7 +686,7 @@ export const onStartPlayback = async (action: ReturnType<typeof ECSRecordingActi
 }
 
 export const onStopPlayback = async (action: ReturnType<typeof ECSRecordingActions.stopPlayback>) => {
-  const api = Engine.instance.api
+  const api = API.instance
 
   const recording = await api.service(recordingPath).get(action.recordingID)
 

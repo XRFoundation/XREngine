@@ -28,8 +28,8 @@ import { useTranslation } from 'react-i18next'
 
 import { FileThumbnailJobState } from '@etherealengine/client-core/src/common/services/FileThumbnailJobState'
 import { PopoverState } from '@etherealengine/client-core/src/common/services/PopoverState'
+import { API } from '@etherealengine/common'
 import { StaticResourceType, UserType, staticResourcePath } from '@etherealengine/common/src/schema.type.module'
-import { Engine } from '@etherealengine/ecs'
 import { ImmutableArray, NO_PROXY, State, getMutableState, useHookstate } from '@etherealengine/hyperflux'
 import { useFind } from '@etherealengine/spatial/src/common/functions/FeathersHooks'
 import { HiPencil, HiPlus, HiXMark } from 'react-icons/hi2'
@@ -99,7 +99,7 @@ export default function FilePropertiesModal({
       for (const resource of fileStaticResources.value) {
         const oldTags = resource.tags ?? []
         const newTags = Array.from(new Set([...addedTags, ...oldTags.filter((tag) => !removedTags.includes(tag))]))
-        await Engine.instance.api.service(staticResourcePath).patch(resource.id, {
+        await API.instance.service(staticResourcePath).patch(resource.id, {
           key: resource.key,
           tags: newTags,
           licensing: resourceDigest.licensing.value,
@@ -125,7 +125,7 @@ export default function FilePropertiesModal({
   const resources = useFind(staticResourcePath, { query })
   useEffect(() => {
     if (resources.data.length === 0) return
-    Engine.instance.api
+    API.instance
       .service('user')
       .get(resources.data[0].userId)
       .then((user) => author.set(user))

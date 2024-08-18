@@ -32,7 +32,6 @@ import { initGA, logPageView } from '@etherealengine/client-core/src/common/anal
 import { NotificationSnackbar } from '@etherealengine/client-core/src/common/services/NotificationService'
 import { useSearchParamState } from '@etherealengine/client-core/src/common/services/RouterService'
 import { useThemeProvider } from '@etherealengine/client-core/src/common/services/ThemeService'
-import Debug from '@etherealengine/client-core/src/components/Debug'
 import InviteToast from '@etherealengine/client-core/src/components/InviteToast'
 import { LoadWebappInjection } from '@etherealengine/client-core/src/components/LoadWebappInjection'
 import { useAuthenticated } from '@etherealengine/client-core/src/user/services/AuthService'
@@ -63,7 +62,6 @@ const AppPage = (props: { children: React.ReactNode }) => {
       <NotificationSnackbar />
       <LoadWebappInjection>{props.children}</LoadWebappInjection>
       <InviteToast />
-      <Debug />
     </>
   )
 }

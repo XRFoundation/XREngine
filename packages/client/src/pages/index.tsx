@@ -30,8 +30,6 @@ import { Navigate } from 'react-router-dom'
 import styles from '@etherealengine/client-core/src/admin/old-styles/admin.module.scss'
 import { NotificationService } from '@etherealengine/client-core/src/common/services/NotificationService'
 
-import '@etherealengine/client-core/src/user/UserUISystem'
-
 import { PopupMenuState } from '@etherealengine/client-core/src/user/components/UserMenu/PopupMenuService'
 import config from '@etherealengine/common/src/config'
 import { getState, useMutableState } from '@etherealengine/hyperflux'

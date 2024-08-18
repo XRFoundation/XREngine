@@ -181,7 +181,7 @@ const OwnerPeerReactor = (props: { uuid: EntityUUID }) => {
     return () => {
       // ensure reactor isn't completely unmounting
       if (!getState(EntityNetworkState)[props.uuid]) return
-      if (ownerPeer !== Engine.instance.store.peerID && Engine.instance.userID === state.ownerId.value) {
+      if (ownerPeer !== Engine.instance.store.peerID && Engine.instance.store.userID === state.ownerId.value) {
         const lowestPeer = [...networkState.users[Engine.instance.userID].value].sort((a, b) => (a > b ? 1 : -1))[0]
         if (lowestPeer !== Engine.instance.store.peerID) return
         dispatchAction(

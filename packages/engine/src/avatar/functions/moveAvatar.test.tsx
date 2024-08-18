@@ -28,6 +28,7 @@ import { strictEqual } from 'assert'
 import React from 'react'
 import { Quaternion, Vector3 } from 'three'
 
+import { API } from '@etherealengine/common'
 import { AvatarID, UserID } from '@etherealengine/common/src/schema.type.module'
 import { Entity, EntityUUID, SystemDefinitions, UUIDComponent } from '@etherealengine/ecs'
 import { getComponent, setComponent } from '@etherealengine/ecs/src/ComponentFunctions'
@@ -56,7 +57,7 @@ describe('moveAvatar function tests', () => {
     createEngine()
     initializeSpatialEngine()
     await Physics.load()
-    Engine.instance.userID = 'userId' as UserID
+    Engine.instance.store.userID = 'userId' as UserID
     sceneEntity = loadEmptyScene()
     setComponent(sceneEntity, SceneComponent)
     physicsWorld = Physics.createWorld(getComponent(sceneEntity, UUIDComponent))
@@ -65,7 +66,7 @@ describe('moveAvatar function tests', () => {
     createMockNetwork()
 
     const eventDispatcher = new EventDispatcher()
-    ;(Engine.instance.api as any) = {
+    ;(API.instance as any) = {
       service: () => {
         return {
           on: (serviceName, cb) => {
@@ -166,7 +167,7 @@ describe('moveAvatar function tests', () => {
   })
 
   it('should take world.physics.timeScale into account when moving avatars, consistent with physics simulation', async () => {
-    Engine.instance.userID = 'user' as UserID
+    Engine.instance.store.userID = 'user' as UserID
 
     const ecsState = getMutableState(ECSState)
     ecsState.simulationTimestep.set(1000 / 60)
@@ -209,7 +210,7 @@ describe('moveAvatar function tests', () => {
   })
 
   it('should not allow velocity to breach a full unit through multiple frames', async () => {
-    Engine.instance.userID = 'user' as UserID
+    Engine.instance.store.userID = 'user' as UserID
 
     const ecsState = getMutableState(ECSState)
     ecsState.simulationTimestep.set(1000 / 60)

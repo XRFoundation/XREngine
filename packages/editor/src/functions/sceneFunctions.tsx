@@ -25,13 +25,13 @@ Ethereal Engine. All Rights Reserved.
 
 import i18n from 'i18next'
 
+import { API } from '@etherealengine/common'
 import config from '@etherealengine/common/src/config'
 import multiLogger from '@etherealengine/common/src/logger'
 import { StaticResourceType, fileBrowserPath, staticResourcePath } from '@etherealengine/common/src/schema.type.module'
 import { cleanString } from '@etherealengine/common/src/utils/cleanString'
 import { EntityUUID, UUIDComponent, UndefinedEntity } from '@etherealengine/ecs'
 import { getComponent, setComponent } from '@etherealengine/ecs/src/ComponentFunctions'
-import { Engine } from '@etherealengine/ecs/src/Engine'
 import { GLTFComponent } from '@etherealengine/engine/src/gltf/GLTFComponent'
 import { GLTFDocumentState } from '@etherealengine/engine/src/gltf/GLTFDocumentState'
 import { GLTFSourceState } from '@etherealengine/engine/src/gltf/GLTFState'
@@ -53,7 +53,7 @@ const logger = multiLogger.child({ component: 'editor:sceneFunctions' })
  */
 export const deleteScene = async (sceneKey: string): Promise<any> => {
   try {
-    await Engine.instance.api.service(fileBrowserPath).remove(sceneKey)
+    await API.instance.service(fileBrowserPath).remove(sceneKey)
   } catch (error) {
     logger.error(error, 'Error in deleting project')
     throw error
@@ -72,7 +72,7 @@ export const renameScene = async (
   const oldName = resource.key.split('/').pop()!
   const newName = newKey.split('/').pop()!
   try {
-    return await Engine.instance.api
+    return await API.instance
       .service(fileBrowserPath)
       .update(null, { oldProject: projectName, newProject: projectName, oldPath, newPath, oldName, newName }, params)
   } catch (error) {
@@ -99,7 +99,7 @@ export const saveSceneGLTF = async (
   const currentSceneDirectory = getState(EditorState).scenePath!.split('/').slice(0, -1).join('/')
 
   if (saveAs) {
-    const existingScene = await Engine.instance.api.service(staticResourcePath).find({
+    const existingScene = await API.instance.service(staticResourcePath).find({
       query: { key: `${currentSceneDirectory}/${sceneName}.gltf`, $limit: 1 }
     })
 
@@ -114,7 +114,7 @@ export const saveSceneGLTF = async (
   const blob = [JSON.stringify(encodedGLTF, null, 2)]
   const file = new File(blob, `${sceneName}.gltf`)
 
-  const currentScene = await Engine.instance.api.service(staticResourcePath).get(sceneAssetID)
+  const currentScene = await API.instance.service(staticResourcePath).get(sceneAssetID)
 
   const [[newPath]] = await Promise.all(
     uploadProjectFiles(
@@ -136,7 +136,7 @@ export const saveSceneGLTF = async (
   newURL.search = ''
   const assetURL = newURL.href.replace(fileServer, '').slice(1) // remove leading slash
 
-  const result = await Engine.instance.api.service(staticResourcePath).find({
+  const result = await API.instance.service(staticResourcePath).find({
     query: { key: assetURL, $limit: 1 }
   })
 
@@ -156,7 +156,7 @@ export const createScene = async (
   projectName: string,
   templateURL = config.client.fileServer + '/projects/etherealengine/default-project/public/scenes/default.gltf'
 ) => {
-  const sceneData = await Engine.instance.api.service(fileBrowserPath).patch(null, {
+  const sceneData = await API.instance.service(fileBrowserPath).patch(null, {
     project: projectName,
     type: 'scene',
     body: templateURL,

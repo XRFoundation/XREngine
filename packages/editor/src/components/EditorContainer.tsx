@@ -51,8 +51,9 @@ import { DndWrapper } from './dnd/DndWrapper'
 import DragLayer from './dnd/DragLayer'
 
 import { useZendesk } from '@etherealengine/client-core/src/hooks/useZendesk'
+import { API } from '@etherealengine/common'
 import { FeatureFlags } from '@etherealengine/common/src/constants/FeatureFlags'
-import { Engine, EntityUUID } from '@etherealengine/ecs'
+import { EntityUUID } from '@etherealengine/ecs'
 import useFeatureFlags from '@etherealengine/engine/src/useFeatureFlags'
 import { EngineState } from '@etherealengine/spatial/src/EngineState'
 import Button from '@etherealengine/ui/src/primitives/tailwind/Button'
@@ -139,7 +140,7 @@ const EditorContainer = () => {
     if (!scenePath.value) return
 
     const abortController = new AbortController()
-    Engine.instance.api
+    API.instance
       .service(staticResourcePath)
       .find({
         query: { key: scenePath.value, type: 'scene', $limit: 1 }

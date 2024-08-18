@@ -23,15 +23,13 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import type { FeathersApplication } from '@feathersjs/feathers'
 import * as bitECS from 'bitecs'
 import { getAllEntities } from 'bitecs'
 import { Cache } from 'three'
 
-import type { ServiceTypes } from '@etherealengine/common/declarations'
-import type { UserID } from '@etherealengine/common/src/schema.type.module'
+import { API } from '@etherealengine/common'
 import * as Hyperflux from '@etherealengine/hyperflux'
-import { createHyperStore, getState, NO_PROXY_STEALTH, ReactorReconciler } from '@etherealengine/hyperflux'
+import { getState, NO_PROXY_STEALTH, ReactorReconciler } from '@etherealengine/hyperflux'
 import { disposeStore, HyperFlux, HyperStore } from '@etherealengine/hyperflux/functions/StoreFunctions'
 
 import { ECSState } from './ECSState'
@@ -43,10 +41,13 @@ import { SystemState } from './SystemState'
 export class Engine {
   static instance: Engine
 
-  api: FeathersApplication<ServiceTypes>
-
-  /** The uuid of the logged-in user */
-  userID: UserID
+  /**
+   * @deprecated use "Engine.instance.store.userID" instead
+   * The uuid of the logged-in user
+   */
+  get userID() {
+    return Engine.instance.store.userID
+  }
 
   store: HyperStore
 
@@ -86,14 +87,12 @@ globalThis.Hyperflux = Hyperflux
 export function createEngine() {
   if (Engine.instance) throw new Error('Store already exists')
   Engine.instance = new Engine()
-  Engine.instance.store = bitECS.createWorld(
-    createHyperStore({
-      getDispatchTime: () => getState(ECSState).simulationTime,
-      getCurrentReactorRoot: () =>
-        getState(SystemState).activeSystemReactors.get(getState(SystemState).currentSystemUUID)
-    })
-  ) as HyperStore
-  const UndefinedEntity = bitECS.addEntity(HyperFlux.store)
+  const hyperstore = HyperFlux.store
+  hyperstore.getCurrentReactorRoot = () =>
+    getState(SystemState).activeSystemReactors.get(getState(SystemState).currentSystemUUID)
+  hyperstore.getDispatchTime = () => getState(ECSState).simulationTime
+  Engine.instance.store = bitECS.createWorld(hyperstore) as HyperStore
+  const UndefinedEntity = bitECS.addEntity(hyperstore)
 }
 
 export async function destroyEngine() {
@@ -101,10 +100,10 @@ export async function destroyEngine() {
 
   getState(ECSState).timer?.clear()
 
-  if (Engine.instance.api) {
-    if ((Engine.instance.api as any).server) await Engine.instance.api.teardown()
+  if (API.instance) {
+    if ((API.instance as any).server) await API.instance.teardown()
 
-    const knex = (Engine.instance.api as any).get?.('knexClient')
+    const knex = (API.instance as any).get?.('knexClient')
     if (knex) await knex.destroy()
   }
 

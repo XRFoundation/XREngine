@@ -56,10 +56,10 @@ import { getPixels } from 'ndarray-pixels'
 import { LoaderUtils } from 'three'
 import { v4 as uuidv4 } from 'uuid'
 
+import { API } from '@etherealengine/common'
 import config from '@etherealengine/common/src/config'
 import { fileBrowserPath } from '@etherealengine/common/src/schema.type.module'
 import { baseName, pathJoin } from '@etherealengine/common/src/utils/miscUtils'
-import { Engine } from '@etherealengine/ecs/src/Engine'
 import {
   ExtractedImageTransformParameters,
   extractParameters,
@@ -748,7 +748,7 @@ export async function transformModel(
       body: data,
       contentType: (await getContentType(args.dst)) || ''
     }
-    result = await Engine.instance.api.service('file-browser').patch(null, uploadArgs)
+    result = await API.instance.service('file-browser').patch(null, uploadArgs)
     */
     /*dispatchAction(
       BufferHandlerExtension.saveBuffer({
@@ -794,8 +794,8 @@ export async function transformModel(
     )
     const { json, resources } = await io.writeJSON(document, { format: Format.GLTF, basename: resourceName })
     const folderURL = resourcePath.replace(config.client.fileServer, '')
-    //await Engine.instance.api.service(fileBrowserPath).remove(folderURL)
-    await Engine.instance.api.service(fileBrowserPath).create(folderURL)
+    //await API.instance.service(fileBrowserPath).remove(folderURL)
+    await API.instance.service(fileBrowserPath).create(folderURL)
 
     json.images?.map((image) => {
       const nuURI = pathJoin(
@@ -827,7 +827,7 @@ export async function transformModel(
         body: data,
         contentType: (await getContentType(uri)) || ''
       }
-      return Engine.instance.api.service(fileBrowserPath).patch(null, args)
+      return API.instance.service(fileBrowserPath).patch(null, args)
     }
     await Promise.all(Object.entries(resources).map(([uri, data]) => doUpload(uri, data)))
     result = await doUpload(args.dst.replace(/\.glb$/, '.gltf'), Buffer.from(JSON.stringify(json)))

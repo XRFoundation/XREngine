@@ -38,9 +38,9 @@ Ethereal Engine. All Rights Reserved.
 import { Params, Query } from '@feathersjs/feathers'
 import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react'
 
+import { API } from '@etherealengine/common'
 import { ServiceTypes } from '@etherealengine/common/declarations'
 import { OpaqueType } from '@etherealengine/common/src/interfaces/OpaqueType'
-import { Engine } from '@etherealengine/ecs/src/Engine'
 import { defineState, getState, NO_PROXY, State, useHookstate, useMutableState } from '@etherealengine/hyperflux'
 
 export type Methods = 'find' | 'get' | 'create' | 'update' | 'patch' | 'remove'
@@ -116,7 +116,7 @@ export const useService = <S extends keyof ServiceTypes, M extends Methods>(
   method: M,
   ...args: Args
 ) => {
-  const service = Engine.instance.api.service(serviceName)
+  const service = API.instance.service(serviceName)
   const state = useMutableState(FeathersState)
 
   const queryParams = {
@@ -323,7 +323,7 @@ function useMethod(
 ) {
   return useCallback(
     (...args) => {
-      const service = Engine.instance.api.service(serviceName)
+      const service = API.instance.service(serviceName)
       state.merge({ status: 'loading', loading: true, data: null, error: null })
       return service[method](...args)
         .then((item) => {
@@ -362,7 +362,7 @@ export function useRealtime(
   refetch: (data: any, eventType: 'created' | 'updated' | 'patched' | 'removed') => void
 ) {
   useLayoutEffect(() => {
-    const service = Engine.instance.api.service(serviceName)
+    const service = API.instance.service(serviceName)
 
     const handleCreated = (data: any) => refetch(data, 'created')
     const handleUpdated = (data: any) => refetch(data, 'updated')

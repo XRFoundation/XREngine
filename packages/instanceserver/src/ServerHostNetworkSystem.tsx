@@ -24,6 +24,7 @@ Ethereal Engine. All Rights Reserved.
 */
 import { useEffect } from 'react'
 
+import { API } from '@etherealengine/common'
 import { RecordingID, recordingResourceUploadPath } from '@etherealengine/common/src/schema.type.module'
 import { Engine } from '@etherealengine/ecs/src/Engine'
 import { defineSystem } from '@etherealengine/ecs/src/SystemFunctions'
@@ -58,7 +59,7 @@ export const uploadRecordingStaticResource = async (props: {
   body: Buffer
   mimeType: string
 }) => {
-  const api = Engine.instance.api
+  const api = API.instance
 
   await api.service(recordingResourceUploadPath).create({
     recordingID: props.recordingID,

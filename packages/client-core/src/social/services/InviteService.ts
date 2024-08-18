@@ -26,6 +26,7 @@ Ethereal Engine. All Rights Reserved.
 import { Paginated } from '@feathersjs/feathers'
 import { useEffect } from 'react'
 
+import { API } from '@etherealengine/common'
 import { EMAIL_REGEX, INVITE_CODE_REGEX, PHONE_REGEX, USER_ID_REGEX } from '@etherealengine/common/src/regex'
 import {
   InviteCode,
@@ -35,7 +36,6 @@ import {
   inviteCodeLookupPath,
   invitePath
 } from '@etherealengine/common/src/schema.type.module'
-import { Engine } from '@etherealengine/ecs/src/Engine'
 import { defineState, getMutableState, getState } from '@etherealengine/hyperflux'
 
 import { NotificationService } from '../../common/services/NotificationService'
@@ -112,7 +112,7 @@ export const InviteService = {
         return
       } else {
         try {
-          const inviteCodeLookups = await Engine.instance.api.service(inviteCodeLookupPath).find({
+          const inviteCodeLookups = await API.instance.service(inviteCodeLookupPath).find({
             query: {
               inviteCode: inviteCode
             }
@@ -144,12 +144,12 @@ export const InviteService = {
     }
 
     try {
-      const existingInviteResult = (await Engine.instance.api.service(invitePath).find({
+      const existingInviteResult = (await API.instance.service(invitePath).find({
         query: { ...data, action: 'sent' }
       })) as Paginated<InviteType>
 
       let inviteResult
-      if (existingInviteResult.total === 0) inviteResult = await Engine.instance.api.service(invitePath).create(data)
+      if (existingInviteResult.total === 0) inviteResult = await API.instance.service(invitePath).create(data)
 
       NotificationService.dispatchNotify('Invite Sent', { variant: 'success' })
       getMutableState(InviteState).sentUpdateNeeded.set(true)
@@ -180,7 +180,7 @@ export const InviteService = {
     }
 
     try {
-      const inviteResult = (await Engine.instance.api.service(invitePath).find({
+      const inviteResult = (await API.instance.service(invitePath).find({
         query: {
           $sort: sortData,
           action: 'received',
@@ -225,7 +225,7 @@ export const InviteService = {
       }
     }
     try {
-      const inviteResult = (await Engine.instance.api.service(invitePath).find({
+      const inviteResult = (await API.instance.service(invitePath).find({
         query: {
           $sort: sortData,
           action: 'sent',
@@ -250,7 +250,7 @@ export const InviteService = {
   },
   removeInvite: async (inviteId: string) => {
     try {
-      await Engine.instance.api.service(invitePath).remove(inviteId)
+      await API.instance.service(invitePath).remove(inviteId)
       getMutableState(InviteState).sentUpdateNeeded.set(true)
     } catch (err) {
       NotificationService.dispatchNotify(err.message, { variant: 'error' })
@@ -258,7 +258,7 @@ export const InviteService = {
   },
   acceptInvite: async (invite: InviteType) => {
     try {
-      await Engine.instance.api.service(acceptInvitePath).get(invite.id, {
+      await API.instance.service(acceptInvitePath).get(invite.id, {
         query: {
           passcode: invite.passcode
         }
@@ -270,7 +270,7 @@ export const InviteService = {
   },
   declineInvite: async (invite: InviteType) => {
     try {
-      await Engine.instance.api.service(invitePath).remove(invite.id)
+      await API.instance.service(invitePath).remove(invite.id)
       getMutableState(InviteState).receivedUpdateNeeded.set(true)
     } catch (err) {
       NotificationService.dispatchNotify(err.message, { variant: 'error' })
@@ -304,12 +304,12 @@ export const InviteService = {
         }
       }
 
-      Engine.instance.api.service(invitePath).on('created', inviteCreatedListener)
-      Engine.instance.api.service(invitePath).on('removed', inviteRemovedListener)
+      API.instance.service(invitePath).on('created', inviteCreatedListener)
+      API.instance.service(invitePath).on('removed', inviteRemovedListener)
 
       return () => {
-        Engine.instance.api.service(invitePath).off('created', inviteCreatedListener)
-        Engine.instance.api.service(invitePath).off('removed', inviteRemovedListener)
+        API.instance.service(invitePath).off('created', inviteCreatedListener)
+        API.instance.service(invitePath).off('removed', inviteRemovedListener)
       }
     }, [])
   }

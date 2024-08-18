@@ -26,14 +26,16 @@ Ethereal Engine. All Rights Reserved.
 import { t } from 'i18next'
 import React, { Suspense, useEffect } from 'react'
 
-import LoadingView from '@etherealengine/ui/src/primitives/tailwind/LoadingView'
+import '../../engine'
 
 import { RouterState } from '@etherealengine/client-core/src/common/services/RouterService'
+import Debug from '@etherealengine/client-core/src/components/Debug'
 import { PopupMenuInline } from '@etherealengine/client-core/src/user/components/UserMenu/PopupMenuInline'
 import { AuthState } from '@etherealengine/client-core/src/user/services/AuthService'
 import { userHasAccess } from '@etherealengine/client-core/src/user/userHasAccess'
 import { EditorPage, useStudioEditor } from '@etherealengine/editor/src/pages/EditorPage'
 import { getMutableState, useHookstate } from '@etherealengine/hyperflux'
+import LoadingView from '@etherealengine/ui/src/primitives/tailwind/LoadingView'
 import { Route, Routes, useLocation } from 'react-router-dom'
 
 export const EditorRouter = () => {
@@ -71,7 +73,12 @@ const EditorProtectedRoutes = () => {
 
   if (!isAuthorized.value) return <LoadingView fullScreen className="block h-12 w-12" title={t('common:loader.auth')} />
 
-  return <EditorRouter />
+  return (
+    <>
+      <EditorRouter />
+      <Debug />
+    </>
+  )
 }
 
 export default EditorProtectedRoutes

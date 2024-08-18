@@ -24,18 +24,11 @@ Ethereal Engine. All Rights Reserved.
 */
 
 import { PopoverState } from '@etherealengine/client-core/src/common/services/PopoverState'
+import { API } from '@etherealengine/common'
 import config from '@etherealengine/common/src/config'
 import { staticResourcePath } from '@etherealengine/common/src/schema.type.module'
 import { pathJoin } from '@etherealengine/common/src/utils/miscUtils'
-import {
-  Engine,
-  Entity,
-  createEntity,
-  entityExists,
-  getComponent,
-  removeEntity,
-  setComponent
-} from '@etherealengine/ecs'
+import { Entity, createEntity, entityExists, getComponent, removeEntity, setComponent } from '@etherealengine/ecs'
 import { GLTFDocumentState } from '@etherealengine/engine/src/gltf/GLTFDocumentState'
 import { ModelComponent } from '@etherealengine/engine/src/scene/components/ModelComponent'
 import { SourceComponent } from '@etherealengine/engine/src/scene/components/SourceComponent'
@@ -92,7 +85,7 @@ export default function CreatePrefabPanel({ entity }: { entity: Entity }) {
       getMutableState(SelectionState).selectedEntities.set([])
       await exportRelativeGLTF(prefabEntity, srcProject, fileName)
 
-      const resources = await Engine.instance.api.service(staticResourcePath).find({
+      const resources = await API.instance.service(staticResourcePath).find({
         query: { key: 'projects/' + srcProject + '/' + fileName }
       })
       if (resources.data.length === 0) {
@@ -100,7 +93,7 @@ export default function CreatePrefabPanel({ entity }: { entity: Entity }) {
       }
       const resource = resources.data[0]
       const tags = [...prefabTag.value]
-      await Engine.instance.api.service(staticResourcePath).patch(resource.id, { tags: tags, project: srcProject })
+      await API.instance.service(staticResourcePath).patch(resource.id, { tags: tags, project: srcProject })
 
       removeEntity(prefabEntity)
       EditorControlFunctions.removeObject([entity])

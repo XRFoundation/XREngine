@@ -26,6 +26,7 @@ Ethereal Engine. All Rights Reserved.
 import { Paginated } from '@feathersjs/feathers'
 import { useEffect } from 'react'
 
+import { API } from '@etherealengine/common'
 import logger from '@etherealengine/common/src/logger'
 import {
   InstanceID,
@@ -35,7 +36,6 @@ import {
   LocationID,
   RoomCode
 } from '@etherealengine/common/src/schema.type.module'
-import { Engine } from '@etherealengine/ecs/src/Engine'
 import { defineState, getMutableState, getState, Identifiable, State, useState } from '@etherealengine/hyperflux'
 import { NetworkState } from '@etherealengine/network'
 
@@ -84,7 +84,7 @@ export const LocationInstanceConnectionService = {
     logger.info({ locationId, instanceId, sceneId }, 'Provision World Server')
     const token = getState(AuthState).authUser.accessToken
     if (instanceId != null) {
-      const instance = (await Engine.instance.api.service(instancePath).find({
+      const instance = (await API.instance.service(instancePath).find({
         query: {
           id: instanceId,
           ended: false
@@ -94,7 +94,7 @@ export const LocationInstanceConnectionService = {
         instanceId = null!
       }
     }
-    const provisionResult = await Engine.instance.api.service(instanceProvisionPath).find({
+    const provisionResult = await API.instance.service(instanceProvisionPath).find({
       query: {
         locationId,
         instanceId,
@@ -124,7 +124,7 @@ export const LocationInstanceConnectionService = {
   provisionExistingServer: async (locationId: LocationID, instanceId: InstanceID, sceneId: string) => {
     logger.info({ locationId, instanceId, sceneId }, 'Provision Existing World Server')
     const token = getState(AuthState).authUser.accessToken
-    const instance = (await Engine.instance.api.service(instancePath).find({
+    const instance = (await API.instance.service(instancePath).find({
       query: {
         id: instanceId,
         ended: false
@@ -140,7 +140,7 @@ export const LocationInstanceConnectionService = {
       }
       return
     }
-    const provisionResult = await Engine.instance.api.service(instanceProvisionPath).find({
+    const provisionResult = await API.instance.service(instanceProvisionPath).find({
       query: {
         locationId,
         instanceId,
@@ -165,7 +165,7 @@ export const LocationInstanceConnectionService = {
   provisionExistingServerByRoomCode: async (locationId: LocationID, roomCode: RoomCode, sceneId: string) => {
     logger.info({ locationId, roomCode, sceneId }, 'Provision Existing World Server')
     const token = getState(AuthState).authUser.accessToken
-    const instance = (await Engine.instance.api.service(instancePath).find({
+    const instance = (await API.instance.service(instancePath).find({
       query: {
         roomCode,
         ended: false
@@ -181,7 +181,7 @@ export const LocationInstanceConnectionService = {
       }
       return
     }
-    const provisionResult = await Engine.instance.api.service(instanceProvisionPath).find({
+    const provisionResult = await API.instance.service(instanceProvisionPath).find({
       query: {
         locationId,
         roomCode,
@@ -219,10 +219,10 @@ export const LocationInstanceConnectionService = {
           })
       }
 
-      Engine.instance.api.service(instanceProvisionPath).on('created', instanceProvisionCreatedListener)
+      API.instance.service(instanceProvisionPath).on('created', instanceProvisionCreatedListener)
 
       return () => {
-        Engine.instance.api.service(instanceProvisionPath).off('created', instanceProvisionCreatedListener)
+        API.instance.service(instanceProvisionPath).off('created', instanceProvisionCreatedListener)
       }
     }, [])
   }

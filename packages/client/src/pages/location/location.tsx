@@ -27,6 +27,8 @@ import { t } from 'i18next'
 import React, { Suspense, useRef } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
+import '../../engine'
+
 import { useEngineInjection } from '@etherealengine/client-core/src/components/World/EngineHooks'
 import { useEngineCanvas } from '@etherealengine/client-core/src/hooks/useEngineCanvas'
 import LocationPage from '@etherealengine/client-core/src/world/Location'

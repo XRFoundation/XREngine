@@ -29,23 +29,24 @@ import feathers from '@feathersjs/client'
 import type { FeathersApplication } from '@feathersjs/feathers'
 import Primus from 'primus-client'
 
+import { API as CommonAPI } from '@etherealengine/common'
+
 import type { ServiceTypes } from '@etherealengine/common/declarations'
 import config from '@etherealengine/common/src/config'
-import { Engine } from '@etherealengine/ecs/src/Engine'
 
 import primusClient from './util/primus-client'
 
-export type FeathersClient = FeathersApplication<ServiceTypes> &
-  AuthenticationClient & {
-    primus: Primus
+declare module '@feathersjs/client' {
+  interface FeathersApplication extends AuthenticationClient {
     authentication: AuthenticationClient
   }
+}
 
-/**@deprecated - use 'Engine.instance.api' instead */
+/**@deprecated - use '@etherealengine.common API.instance' instead */
 export class API {
-  /**@deprecated - use 'Engine.instance.api' instead */
+  /**@deprecated - use '@etherealengine.common API.instance' instead */
   static instance: API
-  client: FeathersClient
+  client: FeathersApplication<ServiceTypes>
 
   static createAPI = () => {
     const feathersClient = feathers()
@@ -66,7 +67,7 @@ export class API {
     API.instance = new API()
     API.instance.client = feathersClient as any
 
-    Engine.instance.api = feathersClient
+    CommonAPI.instance = feathersClient
   }
 }
 

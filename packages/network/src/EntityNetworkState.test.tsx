@@ -71,7 +71,7 @@ describe('EntityNetworkState', () => {
       const peerID = Engine.instance.store.peerID
       const peerID2 = 'peer id 2' as PeerID
 
-      Engine.instance.userID = userId
+      Engine.instance.store.userID = userId
       const network = NetworkState.worldNetwork as Network
 
       NetworkPeerFunctions.createPeer(network, peerID, 0, hostUserId, 0)
@@ -117,7 +117,7 @@ describe('EntityNetworkState', () => {
       const peerID = 'peer id' as PeerID
       const peerID2 = Engine.instance.store.peerID
 
-      Engine.instance.userID = userId
+      Engine.instance.store.userID = userId
 
       const network = NetworkState.worldNetwork as Network
 
@@ -165,7 +165,7 @@ describe('EntityNetworkState', () => {
       const peerID2 = 'peer id 2' as PeerID
       const peerID3 = 'peer id 3' as PeerID
 
-      Engine.instance.userID = userId
+      Engine.instance.store.userID = userId
       const network = NetworkState.worldNetwork as Network
 
       NetworkPeerFunctions.createPeer(network, peerID, 0, hostUserId, 0)
@@ -210,7 +210,7 @@ describe('EntityNetworkState', () => {
       const userId = 'user id' as UserID
       const peerID = Engine.instance.store.peerID
 
-      Engine.instance.userID = userId
+      Engine.instance.store.userID = userId
       const network = NetworkState.worldNetwork as Network
 
       NetworkPeerFunctions.createPeer(network, peerID, 1, userId, 1)
@@ -247,7 +247,7 @@ describe('EntityNetworkState', () => {
       const peerID = Engine.instance.store.peerID
       const peerID2 = 'peer id 2' as PeerID
 
-      Engine.instance.userID = userId
+      Engine.instance.store.userID = userId
       const network = NetworkState.worldNetwork as Network
 
       NetworkPeerFunctions.createPeer(network, hostPeerId, 0, hostUserId, 0)
@@ -317,7 +317,7 @@ describe('EntityNetworkState', () => {
     const peerID = Engine.instance.store.peerID
     const peerID2 = 'peer id 2' as PeerID
 
-    Engine.instance.userID = userId // user being the action dispatcher
+    Engine.instance.store.userID = userId // user being the action dispatcher
     const network = NetworkState.worldNetwork as Network
 
     NetworkPeerFunctions.createPeer(network, hostPeerId, 0, hostUserId, 0)
@@ -385,7 +385,7 @@ describe('EntityNetworkState', () => {
     const peerID = Engine.instance.store.peerID
     const peerID2 = 'peer id 2' as PeerID
 
-    Engine.instance.userID = userId // user being the action dispatcher
+    Engine.instance.store.userID = userId // user being the action dispatcher
     const network = NetworkState.worldNetwork as Network
 
     NetworkPeerFunctions.createPeer(network, hostPeerId, 0, hostUserId, 0)

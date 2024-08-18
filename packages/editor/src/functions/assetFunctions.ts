@@ -28,9 +28,9 @@ import {
   CancelableUploadPromiseReturnType,
   uploadToFeathersService
 } from '@etherealengine/client-core/src/util/upload'
+import { API } from '@etherealengine/common'
 import { assetLibraryPath, fileBrowserPath, fileBrowserUploadPath } from '@etherealengine/common/src/schema.type.module'
 import { processFileName } from '@etherealengine/common/src/utils/processFileName'
-import { Engine } from '@etherealengine/ecs'
 import { modelResourcesPath } from '@etherealengine/engine/src/assets/functions/pathResolver'
 
 import { pathJoin } from '@etherealengine/common/src/utils/miscUtils'
@@ -113,9 +113,9 @@ export const uploadProjectFiles = (projectName: string, files: File[], paths: st
 
 export async function clearModelResources(projectName: string, modelName: string) {
   const resourcePath = `projects/${projectName}/assets/${modelResourcesPath(modelName)}`
-  const exists = await Engine.instance.api.service(fileBrowserPath).get(resourcePath)
+  const exists = await API.instance.service(fileBrowserPath).get(resourcePath)
   if (exists) {
-    await Engine.instance.api.service(fileBrowserPath).remove(resourcePath)
+    await API.instance.service(fileBrowserPath).remove(resourcePath)
   }
 }
 
@@ -188,7 +188,7 @@ export const getEntries = async (directoryReader: FileSystemDirectoryReader): Pr
 export const extractZip = async (path: string): Promise<any> => {
   try {
     const params = { path: path }
-    await Engine.instance.api.service(assetLibraryPath).create(params)
+    await API.instance.service(assetLibraryPath).create(params)
   } catch (err) {
     console.error('error extracting zip: ', err)
   }

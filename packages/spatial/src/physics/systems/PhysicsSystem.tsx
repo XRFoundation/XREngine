@@ -29,7 +29,7 @@ import { useEffect } from 'react'
 import { getComponent, removeComponent, useComponent } from '@etherealengine/ecs/src/ComponentFunctions'
 import { ECSState } from '@etherealengine/ecs/src/ECSState'
 import { Entity } from '@etherealengine/ecs/src/Entity'
-import { QueryReactor, defineQuery } from '@etherealengine/ecs/src/QueryFunctions'
+import { QueryReactor, defineQuery, useQuery } from '@etherealengine/ecs/src/QueryFunctions'
 import { defineSystem } from '@etherealengine/ecs/src/SystemFunctions'
 import { SimulationSystemGroup } from '@etherealengine/ecs/src/SystemGroups'
 import { getMutableState, getState, none, useHookstate } from '@etherealengine/hyperflux'
@@ -115,6 +115,8 @@ const PhysicsSceneReactor = () => {
 
 const reactor = () => {
   const physicsLoaded = useHookstate(false)
+  const physicsLoadPending = useHookstate(false)
+  const physicsQuery = useQuery([SceneComponent])
 
   useEffect(() => {
     const networkState = getMutableState(NetworkState)
@@ -124,14 +126,20 @@ const reactor = () => {
       write: PhysicsSerialization.writeRigidBody
     })
 
-    Physics.load().then(() => {
-      physicsLoaded.set(true)
-    })
-
     return () => {
       networkState.networkSchema[PhysicsSerialization.ID].set(none)
     }
   }, [])
+
+  useEffect(() => {
+    if (physicsLoaded.value || physicsLoadPending.value) return
+    if (physicsQuery.length) {
+      physicsLoadPending.set(true)
+      Physics.load().then(() => {
+        physicsLoaded.set(true)
+      })
+    }
+  }, [physicsQuery])
 
   if (!physicsLoaded.value) return null
 

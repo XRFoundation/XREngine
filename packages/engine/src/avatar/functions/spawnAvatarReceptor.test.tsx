@@ -28,6 +28,7 @@ import assert from 'assert'
 import React from 'react'
 import { Quaternion, Vector3 } from 'three'
 
+import { API } from '@etherealengine/common'
 import { AvatarID, UserID } from '@etherealengine/common/src/schema.type.module'
 import { Entity, EntityUUID, SystemDefinitions, UUIDComponent } from '@etherealengine/ecs'
 import { getComponent, hasComponent, setComponent } from '@etherealengine/ecs/src/ComponentFunctions'
@@ -59,7 +60,7 @@ describe('spawnAvatarReceptor', () => {
     initializeSpatialEngine()
     Engine.instance.store.defaultDispatchDelay = () => 0
     await Physics.load()
-    Engine.instance.userID = 'user' as UserID
+    Engine.instance.store.userID = 'user' as UserID
     sceneEntity = loadEmptyScene()
 
     setComponent(sceneEntity, SceneComponent)
@@ -69,7 +70,7 @@ describe('spawnAvatarReceptor', () => {
     createMockNetwork()
 
     const eventDispatcher = new EventDispatcher()
-    ;(Engine.instance.api as any) = {
+    ;(API.instance as any) = {
       service: () => {
         return {
           on: (serviceName, cb) => {

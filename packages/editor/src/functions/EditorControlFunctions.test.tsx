@@ -52,7 +52,7 @@ describe('EditorControlFunctions', () => {
     createEngine()
     getMutableState(EngineState).isEditing.set(true)
     getMutableState(EngineState).isEditor.set(true)
-    Engine.instance.userID = 'user' as UserID
+    Engine.instance.store.userID = 'user' as UserID
 
     await Physics.load()
     physicsWorldEntity = createEntity()

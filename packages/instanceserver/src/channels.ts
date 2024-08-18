@@ -249,7 +249,7 @@ const loadEngine = async ({ app, sceneId, headers }: { app: Application; sceneId
   const instanceServerState = getState(InstanceServerState)
 
   const hostId = instanceServerState.instance.id as UserID & InstanceID
-  Engine.instance.userID = hostId
+  Engine.instance.store.userID = hostId
   const topic = instanceServerState.isMediaInstance ? NetworkTopics.media : NetworkTopics.world
   HyperFlux.store.forwardingTopics.add(topic)
 

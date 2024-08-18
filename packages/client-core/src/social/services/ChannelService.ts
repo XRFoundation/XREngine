@@ -25,6 +25,7 @@ Ethereal Engine. All Rights Reserved.
 
 import { useEffect } from 'react'
 
+import { API } from '@etherealengine/common'
 import {
   ChannelID,
   channelPath,
@@ -64,7 +65,7 @@ export const ChannelState = defineState({
 export const ChannelService = {
   getChannels: async () => {
     try {
-      const channelResult = (await Engine.instance.api
+      const channelResult = (await API.instance
         .service(channelPath)
         .find({ query: { paginate: false } })) as any as ChannelType[]
       const channelState = getMutableState(ChannelState)
@@ -91,7 +92,7 @@ export const ChannelService = {
   },
   getInstanceChannel: async (instanceID: InstanceID) => {
     try {
-      const channelResult = (await Engine.instance.api.service(channelPath).find({
+      const channelResult = (await API.instance.service(channelPath).find({
         query: {
           instanceId: instanceID,
           paginate: false
@@ -132,7 +133,7 @@ export const ChannelService = {
   },
   createChannel: async (users: UserID[]) => {
     try {
-      const channel = await Engine.instance.api.service(channelPath).create({
+      const channel = await API.instance.service(channelPath).create({
         users
       })
       await ChannelService.getChannels()
@@ -156,7 +157,7 @@ export const ChannelService = {
   },
   removeUserFromChannel: async (channelId: ChannelID, userId: UserID) => {
     try {
-      await Engine.instance.api.service(channelUserPath).remove(null, {
+      await API.instance.service(channelUserPath).remove(null, {
         query: {
           channelId,
           userId
@@ -170,7 +171,7 @@ export const ChannelService = {
   },
   removeChannel: async (channelId: ChannelID) => {
     try {
-      await Engine.instance.api.service(channelPath).remove(channelId)
+      await API.instance.service(channelPath).remove(channelId)
       await ChannelService.getChannels()
     } catch (err) {
       NotificationService.dispatchNotify(err.message, { variant: 'error' })
@@ -224,16 +225,16 @@ export const ChannelService = {
         }
       }
 
-      Engine.instance.api.service(channelPath).on('created', channelCreatedListener)
-      Engine.instance.api.service(channelPath).on('patched', channelPatchedListener)
-      Engine.instance.api.service(channelPath).on('removed', channelRemovedListener)
-      Engine.instance.api.service(channelUserPath).on('removed', channelUserRemovedListener)
+      API.instance.service(channelPath).on('created', channelCreatedListener)
+      API.instance.service(channelPath).on('patched', channelPatchedListener)
+      API.instance.service(channelPath).on('removed', channelRemovedListener)
+      API.instance.service(channelUserPath).on('removed', channelUserRemovedListener)
 
       return () => {
-        Engine.instance.api.service(channelPath).off('created', channelCreatedListener)
-        Engine.instance.api.service(channelPath).off('patched', channelPatchedListener)
-        Engine.instance.api.service(channelPath).off('removed', channelRemovedListener)
-        Engine.instance.api.service(channelUserPath).off('removed', channelUserRemovedListener)
+        API.instance.service(channelPath).off('created', channelCreatedListener)
+        API.instance.service(channelPath).off('patched', channelPatchedListener)
+        API.instance.service(channelPath).off('removed', channelRemovedListener)
+        API.instance.service(channelUserPath).off('removed', channelUserRemovedListener)
       }
     }, [])
   }

@@ -26,6 +26,7 @@ Ethereal Engine. All Rights Reserved.
 import _ from 'lodash'
 import { Spark } from 'primus'
 
+import { API } from '@etherealengine/common'
 import {
   identityProviderPath,
   instanceAuthorizedUserPath,
@@ -42,7 +43,6 @@ import {
 import { toDateTimeSql } from '@etherealengine/common/src/utils/datetime-sql'
 import { EntityUUID } from '@etherealengine/ecs'
 import { getComponent } from '@etherealengine/ecs/src/ComponentFunctions'
-import { Engine } from '@etherealengine/ecs/src/Engine'
 import { AvatarComponent } from '@etherealengine/engine/src/avatar/components/AvatarComponent'
 import { AuthTask } from '@etherealengine/engine/src/avatar/functions/receiveJoinWorld'
 import { respawnAvatar } from '@etherealengine/engine/src/avatar/functions/respawnAvatar'
@@ -67,7 +67,7 @@ const logger = multiLogger.child({ component: 'instanceserver:network' })
 const isNameRegex = /instanceserver-([a-zA-Z0-9]{5}-[a-zA-Z0-9]{5})/
 
 export const setupIPs = async () => {
-  const app = Engine.instance.api as Application
+  const app = API.instance as Application
 
   const serverState = getState(ServerState)
   const instanceServerState = getMutableState(InstanceServerState)
@@ -269,7 +269,7 @@ const getUserSpawnFromInvite = async (
   iteration = 0
 ) => {
   if (inviteCode) {
-    const inviteCodeLookups = await Engine.instance.api.service(inviteCodeLookupPath).find({
+    const inviteCodeLookups = await API.instance.service(inviteCodeLookupPath).find({
       query: {
         inviteCode
       }
@@ -343,7 +343,7 @@ export async function handleDisconnect(network: SocketWebRTCServerNetwork, peerI
   // This will only clear transports if the client's socketId matches the socket that's disconnecting.
   if (peerID === disconnectedClient?.peerID) {
     const instanceServerState = getState(InstanceServerState)
-    const app = Engine.instance.api as Application
+    const app = API.instance as Application
 
     if (!instanceServerState.isMediaInstance) {
       app

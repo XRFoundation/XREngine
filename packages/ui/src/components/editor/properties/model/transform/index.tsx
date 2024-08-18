@@ -26,6 +26,7 @@ Ethereal Engine. All Rights Reserved.
 import React, { useCallback, useEffect } from 'react'
 import { DoubleSide, Mesh } from 'three'
 
+import { API } from '@etherealengine/common'
 import { modelTransformPath } from '@etherealengine/common/src/schema.type.module'
 import {
   ComponentType,
@@ -33,7 +34,6 @@ import {
   hasComponent,
   useComponent
 } from '@etherealengine/ecs/src/ComponentFunctions'
-import { Engine } from '@etherealengine/ecs/src/Engine'
 import { Entity } from '@etherealengine/ecs/src/Entity'
 import exportGLTF from '@etherealengine/editor/src/functions/exportGLTF'
 import { SelectionState } from '@etherealengine/editor/src/services/SelectionServices'
@@ -141,7 +141,7 @@ export default function ModelTransformProperties({ entity, onChangeModel }: { en
         if (clientside) {
           nuPath = await clientSideTransformModel(variant as ModelTransformParameters)
         } else {
-          await Engine.instance.api.service(modelTransformPath).create(variant)
+          await API.instance.service(modelTransformPath).create(variant)
         }
       }
 
@@ -189,7 +189,7 @@ export default function ModelTransformProperties({ entity, onChangeModel }: { en
       console.log('saved baked model')
       //perform gltf transform
       console.log('transforming model at ' + bakedPath + '...')
-      const transformedPath = await Engine.instance.api.service(modelTransformPath).create(transformParms.value)
+      const transformedPath = await API.instance.service(modelTransformPath).create(transformParms.value)
       console.log('transformed model into ' + transformedPath)
       onChangeModel(transformedPath)
     }

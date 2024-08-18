@@ -24,10 +24,10 @@ Ethereal Engine. All Rights Reserved.
 */
 
 import { NotificationService } from '@etherealengine/client-core/src/common/services/NotificationService'
+import { API } from '@etherealengine/common'
 import config from '@etherealengine/common/src/config'
 import { archiverPath } from '@etherealengine/common/src/schema.type.module'
 import { bytesToSize } from '@etherealengine/common/src/utils/btyesToSize'
-import { Engine } from '@etherealengine/ecs'
 import { downloadBlobAsZip } from '@etherealengine/editor/src/functions/assetFunctions'
 import { defineState, getMutableState, useMutableState } from '@etherealengine/hyperflux'
 import React from 'react'
@@ -44,7 +44,7 @@ const DownloadProjectState = defineState({
 })
 
 export const handleDownloadProject = async (projectName: string, selectedDirectory: string) => {
-  const data = await Engine.instance.api
+  const data = await API.instance
     .service(archiverPath)
     .get(null, { query: { project: projectName } })
     .catch((err: Error) => {

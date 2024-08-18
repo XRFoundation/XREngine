@@ -32,7 +32,7 @@ import { useFind, useSearch } from '@etherealengine/spatial/src/common/functions
 import ConfirmDialog from '@etherealengine/ui/src/components/tailwind/ConfirmDialog'
 import Button from '@etherealengine/ui/src/primitives/tailwind/Button'
 
-import { Engine } from '@etherealengine/ecs'
+import { API } from '@etherealengine/common'
 import { PopoverState } from '../../../common/services/PopoverState'
 import { resourceColumns } from '../../common/constants/resources'
 import DataTable from '../../common/Table'
@@ -87,7 +87,7 @@ export default function ResourceTable({ search }: { search: string }) {
                 <ConfirmDialog
                   text={`${t('admin:components.resources.confirmResourceDelete')} '${el.key}'?`}
                   onSubmit={async () => {
-                    await Engine.instance.api.service(staticResourcePath).remove(el.id)
+                    await API.instance.service(staticResourcePath).remove(el.id)
                   }}
                 />
               )
