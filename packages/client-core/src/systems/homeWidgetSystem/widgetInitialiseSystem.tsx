@@ -23,40 +23,15 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import type { ProjectConfigInterface } from '@etherealengine/projects/ProjectConfigInterface'
+import { useEffect } from 'react'
 
-const config: ProjectConfigInterface = {
-  onEvent: './projectEventHooks.ts',
-  thumbnail: '/static/etherealengine_thumbnail.jpg',
-  routes: {
-    '/': {
-      component: () => import('@etherealengine/client/src/pages/index'),
-      props: {
-        exact: true
-      }
-    },
-    '/admin': {
-      component: () => import('@etherealengine/client/src/pages/admin')
-    },
-    '/location': {
-      component: () => import('@etherealengine/client/src/pages/location/location')
-    },
-    '/studio': {
-      component: () => import('@etherealengine/client/src/pages/editor')
-    },
-    '/room': {
-      component: () => import('@etherealengine/client/src/pages/room')
-    },
-    '/capture': {
-      component: () => import('@etherealengine/client/src/pages/capture')
-    },
-    '/chat': {
-      component: () => import('@etherealengine/client/src/pages/chat/chat')
-    },
-    '/home': {
-      component: () => import('@etherealengine/client/src/pages/home/home')
-    }
-  }
+import { startSystems } from '@etherealengine/engine/src/ecs/functions/SystemFunctions'
+import { TransformSystem } from '@etherealengine/engine/src/transform/systems/TransformSystem'
+
+import { WidgetUISystem } from '@etherealengine/client-core/src/systems/WidgetUISystem'
+
+export const widgetInitialiseSystem = () => {
+  useEffect(() => {
+    startSystems([WidgetUISystem], { before: TransformSystem })
+  }, [])
 }
-
-export default config

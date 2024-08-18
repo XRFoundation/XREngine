@@ -23,40 +23,20 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import type { ProjectConfigInterface } from '@etherealengine/projects/ProjectConfigInterface'
+import { LoadingCircle } from '@etherealengine/client-core/src/components/LoadingCircle'
+import HomePage from '@etherealengine/client-core/src/systems/homeWidgetSystem/home'
+import { t } from 'i18next'
+import React, { Suspense } from 'react'
+import { Route, Routes } from 'react-router-dom'
 
-const config: ProjectConfigInterface = {
-  onEvent: './projectEventHooks.ts',
-  thumbnail: '/static/etherealengine_thumbnail.jpg',
-  routes: {
-    '/': {
-      component: () => import('@etherealengine/client/src/pages/index'),
-      props: {
-        exact: true
-      }
-    },
-    '/admin': {
-      component: () => import('@etherealengine/client/src/pages/admin')
-    },
-    '/location': {
-      component: () => import('@etherealengine/client/src/pages/location/location')
-    },
-    '/studio': {
-      component: () => import('@etherealengine/client/src/pages/editor')
-    },
-    '/room': {
-      component: () => import('@etherealengine/client/src/pages/room')
-    },
-    '/capture': {
-      component: () => import('@etherealengine/client/src/pages/capture')
-    },
-    '/chat': {
-      component: () => import('@etherealengine/client/src/pages/chat/chat')
-    },
-    '/home': {
-      component: () => import('@etherealengine/client/src/pages/home/home')
-    }
-  }
+const HomeRoutes = () => {
+  return (
+    <Suspense fallback={<LoadingCircle message={t('common:loader.loadingLocation')} />}>
+      <Routes>
+        <Route path=":locationName" element={<HomePage />} />
+      </Routes>
+    </Suspense>
+  )
 }
 
-export default config
+export default HomeRoutes
