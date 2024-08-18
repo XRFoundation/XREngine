@@ -48,13 +48,15 @@ const logger = multiLogger.child({ component: 'hyperflux:State' })
 export const NO_PROXY = { noproxy: true }
 export const NO_PROXY_STEALTH = { noproxy: true, stealth: true }
 
+/** @deprecated */
 export type ReceptorMap = Record<string, ActionReceptor<any>>
+export type ReceptorsType = Array<ActionReceptor<any>>
 
 export type StateDefinition<S, I, E, Receptors extends ReceptorMap> = {
   name: string
   initial: SetInitialStateAction<S>
   extension?: ExtensionFactory<S, I, E>
-  receptors?: Receptors
+  receptors?: Receptors | ReceptorsType
   receptorActionQueue?: ActionQueueHandle
   reactor?: any // why does React.FC break types?
   /** @deprecated use `extension` */

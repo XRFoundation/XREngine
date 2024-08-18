@@ -33,7 +33,7 @@ import { createHookableFunction } from '@etherealengine/common/src/utils/createH
 import { deepEqual } from '@etherealengine/common/src/utils/deepEqual'
 
 import { ReactorRoot } from './ReactorFunctions'
-import { setInitialState, StateDefinitions } from './StateFunctions'
+import { getMutableState, setInitialState, StateDefinitions } from './StateFunctions'
 import { HyperFlux } from './StoreFunctions'
 
 const logger = multiLogger.child({ component: 'hyperflux:Action' })
@@ -224,7 +224,10 @@ export type PartialActionType<Shape extends ActionShape<any>> = Omit<
  */
 export const ActionDefinitions = {} as Record<string, any>
 
-export type ActionReceptor<A extends ActionShape<Action>> = ((action: A) => void) & {
+export type ActionReceptor<A extends ActionShape<Action>> = ((
+  action: A,
+  state: ReturnType<typeof getMutableState>
+) => void) & {
   matchesAction: Validator<A, any>
 }
 
@@ -306,7 +309,9 @@ export function defineAction<Shape extends Omit<ActionShape<Action>, keyof Actio
   actionCreator.extend = <ExtendShape extends ActionShape<Action>>(extendShape: ExtendShape & ActionOptions) => {
     return { ...shape, ...extendShape, type: [extendShape.type, ...(Array.isArray(type) ? type : [type])] }
   }
-  actionCreator.receive = (actionReceptor: (action: ResolvedAction) => void) => {
+  actionCreator.receive = (
+    actionReceptor: (action: ResolvedAction, state: ReturnType<typeof getMutableState>) => void
+  ) => {
     const hookableReceptor = createHookableFunction(actionReceptor)
     hookableReceptor['matchesAction'] = matchesShape
     return hookableReceptor as typeof hookableReceptor & ActionReceptor<Shape>
@@ -443,7 +448,7 @@ const createEventSourceQueues = (action: Required<ResolvedActionType>) => {
           try {
             const receptor = definitionReceptor as ActionReceptor<ResolvedActionType>
             if (receptor.matchesAction.test(action)) {
-              receptor(action)
+              receptor(action, getMutableState(definition))
               hasNewActions = true
             }
           } catch (e) {
