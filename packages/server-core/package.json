@@ -102,7 +102,7 @@
     "mp3-duration": "^1.1.0",
     "multer": "1.4.5-lts.1",
     "mysql": "2.18.1",
-    "mysql2": "3.2.0",
+    "mysql2": "3.9.8",
     "nock": "^13.4.0",
     "node-fetch": "2.6.9",
     "nodemailer-smtp-transport": "^2.7.4",
