@@ -176,7 +176,7 @@ export default function CreatePrefabPanel({ entity }: { entity: Entity }) {
               }}
               size="small"
               variant="outline"
-              className="text-left text-xs"
+              className="mt-6 max-h-20 text-left text-xs"
             >
               {' '}
               x{' '}
