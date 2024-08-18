@@ -29,7 +29,7 @@ import { getContentType } from '@etherealengine/common/src/utils/getContentType'
 import { UUIDComponent } from '@etherealengine/ecs'
 import { getComponent, useOptionalComponent } from '@etherealengine/ecs/src/ComponentFunctions'
 import { Engine } from '@etherealengine/ecs/src/Engine'
-import { Entity } from '@etherealengine/ecs/src/Entity'
+import { Entity, EntityUUID } from '@etherealengine/ecs/src/Entity'
 import { defineQuery } from '@etherealengine/ecs/src/QueryFunctions'
 import { AssetLoaderState } from '@etherealengine/engine/src/assets/state/AssetLoaderState'
 import { PositionalAudioComponent } from '@etherealengine/engine/src/audio/components/PositionalAudioComponent'
@@ -64,7 +64,7 @@ export async function addMediaNode(
   parent?: Entity,
   before?: Entity,
   extraComponentJson: ComponentJsonType[] = []
-) {
+): Promise<EntityUUID | null> {
   const contentType = (await getContentType(url)) || ''
   const { hostname } = new URL(url)
 
@@ -92,35 +92,41 @@ export async function addMediaNode(
       // const lineGeometry = new BufferGeometry().setFromPoints([lineStart, lineEnd])
       // setComponent(rayEntity, LineSegmentComponent, { geometry: lineGeometry })
       const gltfLoader = getState(AssetLoaderState).gltfLoader
-      gltfLoader.load(url, (gltf) => {
-        const material = iterateObject3D(
-          gltf.scene,
-          (mesh: Mesh) => mesh.material as Material,
-          (mesh: Mesh) => mesh?.isMesh
-        )[0]
-        if (!material) return
-        const materialEntity = createMaterialEntity(material)
-        let foundTarget = false
-        for (const intersection of intersections) {
-          iterateObject3D(intersection.object, (mesh: Mesh) => {
-            if (!mesh?.isMesh || !mesh.visible) return
-            assignMaterial(mesh.entity, materialEntity)
-            foundTarget = true
-          })
-          if (foundTarget) break
-        }
-      })
+      return await new Promise((resolve) =>
+        gltfLoader.load(url, (gltf) => {
+          const material = iterateObject3D(
+            gltf.scene,
+            (mesh: Mesh) => mesh.material as Material,
+            (mesh: Mesh) => mesh?.isMesh
+          )[0]
+          if (!material) return
+          const materialEntity = createMaterialEntity(material)
+          let foundTarget = false
+          for (const intersection of intersections) {
+            iterateObject3D(intersection.object, (mesh: Mesh) => {
+              if (!mesh?.isMesh || !mesh.visible) return
+              assignMaterial(mesh.entity, materialEntity)
+              foundTarget = true
+            })
+            if (foundTarget) break
+          }
+          resolve(getComponent(materialEntity, UUIDComponent))
+        })
+      )
     } else if (contentType.startsWith('model/lookdev')) {
       const gltfLoader = getState(AssetLoaderState).gltfLoader
-      gltfLoader.load(url, (gltf) => {
-        const componentJson = gltf.scene.children[0].userData.componentJson
-        EditorControlFunctions.overwriteLookdevObject(
-          [{ name: ModelComponent.jsonID, props: { src: url } }, ...extraComponentJson],
-          componentJson,
-          parent!,
-          before
-        )
-      })
+      return await new Promise((resolve) =>
+        gltfLoader.load(url, (gltf) => {
+          const componentJson = gltf.scene.children[0].userData.componentJson
+          EditorControlFunctions.overwriteLookdevObject(
+            [{ name: ModelComponent.jsonID, props: { src: url } }, ...extraComponentJson],
+            componentJson,
+            parent!,
+            before
+          )
+          resolve(null)
+        })
+      )
     } else if (contentType.startsWith('model/prefab')) {
       const { entityUUID, sceneID } = EditorControlFunctions.createObjectFromSceneElement(
         [{ name: ModelComponent.jsonID, props: { src: url } }, ...extraComponentJson],
@@ -139,8 +145,9 @@ export async function addMediaNode(
 
         return null
       })
+      return entityUUID
     } else {
-      EditorControlFunctions.createObjectFromSceneElement(
+      const { entityUUID } = EditorControlFunctions.createObjectFromSceneElement(
         [
           { name: ModelComponent.jsonID, props: { src: url } },
           { name: ShadowComponent.jsonID },
@@ -150,9 +157,10 @@ export async function addMediaNode(
         parent!,
         before
       )
+      return entityUUID
     }
   } else if (contentType.startsWith('video/') || hostname.includes('twitch.tv') || hostname.includes('youtube.com')) {
-    EditorControlFunctions.createObjectFromSceneElement(
+    const { entityUUID } = EditorControlFunctions.createObjectFromSceneElement(
       [
         { name: VideoComponent.jsonID },
         { name: MediaComponent.jsonID, props: { resources: [url] } },
@@ -161,14 +169,16 @@ export async function addMediaNode(
       parent!,
       before
     )
+    return entityUUID
   } else if (contentType.startsWith('image/')) {
-    EditorControlFunctions.createObjectFromSceneElement(
+    const { entityUUID } = EditorControlFunctions.createObjectFromSceneElement(
       [{ name: ImageComponent.jsonID, props: { source: url } }, ...extraComponentJson],
       parent!,
       before
     )
+    return entityUUID
   } else if (contentType.startsWith('audio/')) {
-    EditorControlFunctions.createObjectFromSceneElement(
+    const { entityUUID } = EditorControlFunctions.createObjectFromSceneElement(
       [
         { name: PositionalAudioComponent.jsonID },
         { name: MediaComponent.jsonID, props: { resources: [url] } },
@@ -177,8 +187,9 @@ export async function addMediaNode(
       parent!,
       before
     )
+    return entityUUID
   } else if (url.includes('.uvol')) {
-    EditorControlFunctions.createObjectFromSceneElement(
+    const { entityUUID } = EditorControlFunctions.createObjectFromSceneElement(
       [
         { name: VolumetricComponent.jsonID },
         { name: MediaComponent.jsonID, props: { resources: [url] } },
@@ -187,5 +198,8 @@ export async function addMediaNode(
       parent!,
       before
     )
+    return entityUUID
+  } else {
+    return null
   }
 }
