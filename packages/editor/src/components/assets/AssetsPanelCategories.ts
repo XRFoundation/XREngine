@@ -55,7 +55,7 @@ export const AssetsPanelCategories = defineState({
         Cottage: {},
         Scifi: {},
         Modern: {},
-        Nature: {},
+
         Ecommerce: {}
       },
       Prop: {
@@ -64,7 +64,8 @@ export const AssetsPanelCategories = defineState({
         //   Showcase: {},
         //   Displays: {}
         // }
-      }
+      },
+      Nature: {}
       // Terrain: {}
     },
     Material: {
