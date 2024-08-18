@@ -36,6 +36,7 @@ import {
   removeEntity,
   setComponent
 } from '@etherealengine/ecs'
+import PrefabConfirmationPanelDialog from '@etherealengine/editor/src/components/dialogs/PrefabConfirmationPanelDialog'
 import { GLTFDocumentState } from '@etherealengine/engine/src/gltf/GLTFDocumentState'
 import { ModelComponent } from '@etherealengine/engine/src/scene/components/ModelComponent'
 import { SourceComponent } from '@etherealengine/engine/src/scene/components/SourceComponent'
@@ -55,6 +56,7 @@ import { EditorControlFunctions } from '../../functions/EditorControlFunctions'
 import { exportRelativeGLTF } from '../../functions/exportGLTF'
 import { EditorState } from '../../services/EditorServices'
 import { SelectionState } from '../../services/SelectionServices'
+
 export default function CreatePrefabPanel({ entity }: { entity: Entity }) {
   const defaultPrefabFolder = useHookstate<string>('assets/custom-prefabs')
   const prefabName = useHookstate<string>('prefab')
@@ -129,6 +131,8 @@ export default function CreatePrefabPanel({ entity }: { entity: Entity }) {
       defaultPrefabFolder.set('assets/custom-prefabs')
       prefabName.set('prefab')
       prefabTag.set([])
+
+      PopoverState.showPopupover(<PrefabConfirmationPanelDialog entity={entity} />)
     } catch (e) {
       console.error(e)
     }
