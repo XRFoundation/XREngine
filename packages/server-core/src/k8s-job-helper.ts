@@ -37,7 +37,8 @@ export const createExecutorJob = async (
   jobBody: k8s.V1Job,
   jobLabelSelector: string,
   timeout: number,
-  jobId: string
+  jobId: string,
+  waitForFinish = true
 ) => {
   const k8BatchClient = getState(ServerState).k8BatchClient
 
@@ -51,6 +52,7 @@ export const createExecutorJob = async (
   await k8BatchClient.createNamespacedJob('default', jobBody)
   let counter = 0
   return new Promise((resolve, reject) => {
+    if (!waitForFinish) resolve({})
     const interval = setInterval(async () => {
       counter++
 
