@@ -495,6 +495,8 @@ const AssetPanel = () => {
   }, [categories, selectedCategory])
 
   const staticResourcesFindApi = () => {
+    const abortController = new AbortController()
+
     searchTimeoutCancelRef.current?.()
     loading.set(true)
 
@@ -535,6 +537,8 @@ const AssetPanel = () => {
         .service(staticResourcePath)
         .find({ query })
         .then((resources) => {
+          if (abortController.signal.aborted) return
+
           if (staticResourcesPagination.skip.value > 0) {
             searchedStaticResources.merge(resources.data)
           } else {
@@ -547,10 +551,18 @@ const AssetPanel = () => {
 
     debouncedSearchQuery()
     searchTimeoutCancelRef.current = debouncedSearchQuery.cancel
+
+    return () => {
+      abortController.abort()
+    }
   }
 
   useEffect(() => staticResourcesPagination.skip.set(0), [searchText])
-  useEffect(() => staticResourcesFindApi(), [searchText, selectedCategory, staticResourcesPagination.skip])
+  useEffect(() => {
+    const abortSignal = staticResourcesFindApi()
+
+    return () => abortSignal()
+  }, [searchText, selectedCategory, staticResourcesPagination.skip])
 
   const ResourceItems = () => (
     <>
