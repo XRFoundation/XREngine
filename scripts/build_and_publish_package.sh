@@ -131,11 +131,5 @@ else
     --build-arg VITE_ZENDESK_AUTHENTICATION_ENABLED=$VITE_ZENDESK_AUTHENTICATION_ENABLED .
 fi
 
-if [ $PRIVATE_REPO == "true" ]; then
-  npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-$PACKAGE --region $REGION --service $PACKAGE --releaseName $STAGE
-else
-  npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-$PACKAGE --region us-east-1 --service $PACKAGE --releaseName $STAGE --public
-fi
-
 BUILD_END_TIME=$(date +"%d-%m-%yT%H-%M-%S")
 echo "${PACKAGE} build started at ${BUILD_START_TIME}, ended at ${BUILD_END_TIME}"

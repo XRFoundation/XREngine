@@ -65,6 +65,25 @@ then
   npm run record-build-error -- --service=instanceserver --isDocker=true
   npm run record-build-error -- --service=taskserver --isDocker=true
   #npm run record-build-error -- --service=testbot --isDocker=true
+
+  if [ $DESTINATION_REPO_PROVIDER == "aws" ]
+  then
+    echo "SHOULD PRUNE ECR IMAGES"
+    if [ $PRIVATE_REPO == "true" ]
+    then
+      echo "PRUNING PRIVATE REPOS"
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-api --region $AWS_REGION --service api --releaseName $RELEASE_NAME
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-client --region $AWS_REGION --service client --releaseName $RELEASE_NAME
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-instanceserver --region $AWS_REGION --service instanceserver --releaseName $RELEASE_NAME
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-taskserver --region $AWS_REGION --service taskserver --releaseName $RELEASE_NAME
+    else
+      echo "PRUNING PUBLIC REPOS"
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-api --region us-east-1 --service api --releaseName $RELEASE_NAME --public
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-client --region us-east-1 --service client --releaseName $RELEASE_NAME --public
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-instanceserver --region us-east-1 --service instancserver --releaseName $RELEASE_NAME --public
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-taskserver --region us-east-1 --service taskserver --releaseName $RELEASE_NAME --public
+    fi
+  fi
 elif [ "$SERVE_CLIENT_FROM_API" = "true" ]
 then
   bash ./scripts/build_and_publish_package.sh $RELEASE_NAME api api-client $START_TIME $AWS_REGION $NODE_ENV $DESTINATION_REPO_PROVIDER $PRIVATE_REPO >api-build-logs.txt 2>api-build-error.txt &
@@ -78,6 +97,23 @@ then
   npm run record-build-error -- --service=instanceserver --isDocker=true
   npm run record-build-error -- --service=taskserver --isDocker=true
   #npm run record-build-error -- --service=testbot --isDocker=true
+
+  if [ $DESTINATION_REPO_PROVIDER == "aws" ]
+  then
+    echo "SHOULD PRUNE ECR IMAGES"
+    if [ $PRIVATE_REPO == "true" ]
+    then
+      echo "PRUNING PRIVATE REPOS"
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-api --region $AWS_REGION --service api --releaseName $RELEASE_NAME
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-instanceserver --region $AWS_REGION --service instanceserver --releaseName $RELEASE_NAME
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-taskserver --region $AWS_REGION --service taskserver --releaseName $RELEASE_NAME
+    else
+      echo "PRUNING PUBLIC REPOS"
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-api --region us-east-1 --service api --releaseName $RELEASE_NAME --public
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-instanceserver --region us-east-1 --service instancserver --releaseName $RELEASE_NAME --public
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-taskserver --region us-east-1 --service taskserver --releaseName $RELEASE_NAME --public
+    fi
+  fi
 else
   bash ./scripts/build_and_publish_package.sh $RELEASE_NAME api api $START_TIME $AWS_REGION $NODE_ENV $DESTINATION_REPO_PROVIDER $PRIVATE_REPO >api-build-logs.txt 2>api-build-error.txt &
   bash ./scripts/build_and_publish_package.sh $RELEASE_NAME client client $START_TIME $AWS_REGION $NODE_ENV $DESTINATION_REPO_PROVIDER $PRIVATE_REPO >client-build-logs.txt 2>client-build-error.txt &
@@ -92,6 +128,22 @@ else
   npm run record-build-error -- --service=instanceserver --isDocker=true
   npm run record-build-error -- --service=taskserver --isDocker=true
   #npm run record-build-error -- --service=testbot --isDocker=true
+
+  if [ $DESTINATION_REPO_PROVIDER == "aws" ]
+  then
+    if [ $PRIVATE_REPO == "true" ]
+    then
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-api --region $AWS_REGION --service api --releaseName $RELEASE_NAME
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-client --region $AWS_REGION --service client --releaseName $RELEASE_NAME
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-instanceserver --region $AWS_REGION --service instanceserver --releaseName $RELEASE_NAME
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-taskserver --region $AWS_REGION --service taskserver --releaseName $RELEASE_NAME
+    else
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-api --region us-east-1 --service api --releaseName $RELEASE_NAME --public
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-client --region us-east-1 --service client --releaseName $RELEASE_NAME --public
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-instanceserver --region us-east-1 --service instancserver --releaseName $RELEASE_NAME --public
+      npx ts-node ./scripts/prune_ecr_images.ts --repoName $DESTINATION_REPO_NAME_STEM-taskserver --region us-east-1 --service taskserver --releaseName $RELEASE_NAME --public
+    fi
+  fi
 fi
 
 bash ./scripts/deploy.sh $RELEASE_NAME ${TAG}__${START_TIME}
