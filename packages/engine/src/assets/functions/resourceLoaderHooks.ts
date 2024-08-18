@@ -46,7 +46,7 @@ function useLoader<T extends ResourceAssetType>(
   const value = useHookstate<T | null>(null)
   const error = useHookstate<ErrorEvent | Error | null>(null)
   const progress = useHookstate<ProgressEvent<EventTarget> | null>(null)
-  const uuid = useHookstate<string>(uuidv4())
+  const uuid = useHookstate<string>(uuidv4)
 
   const unload = () => {
     if (url) ResourceManager.unload(url, entity, uuid.value)

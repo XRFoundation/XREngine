@@ -39,7 +39,7 @@ import ErrorPopUp from '@etherealengine/editor/src/components/popup/ErrorPopUp'
 import { EditorComponentType, commitProperty } from '@etherealengine/editor/src/components/properties/Util'
 import { exportRelativeGLTF } from '@etherealengine/editor/src/functions/exportGLTF'
 import { EditorState } from '@etherealengine/editor/src/services/EditorServices'
-import { updateModelResource } from '@etherealengine/engine/src/assets/functions/resourceLoaderFunctions'
+import { ResourceLoaderManager } from '@etherealengine/engine/src/assets/functions/resourceLoaderFunctions'
 import { recursiveHipsLookup } from '@etherealengine/engine/src/avatar/AvatarBoneMatching'
 import { getEntityErrors } from '@etherealengine/engine/src/scene/components/ErrorComponent'
 import { ModelComponent } from '@etherealengine/engine/src/scene/components/ModelComponent'
@@ -112,6 +112,7 @@ export const ModelNodeEditor: EditorComponentType = (props) => {
     exportRelativeGLTF(entity, srcProject.value, fileName).then(() => {
       const nuPath = pathJoin(config.client.fileServer, 'projects', srcProject.value, fileName)
       commitProperty(ModelComponent, 'src')(nuPath)
+      ResourceLoaderManager.updateResource(nuPath)
       exporting.set(false)
     })
   }
@@ -142,7 +143,7 @@ export const ModelNodeEditor: EditorComponentType = (props) => {
           value={modelComponent.src.value}
           onRelease={(src) => {
             if (src !== modelComponent.src.value) commitProperty(ModelComponent, 'src')(src)
-            else updateModelResource(src)
+            else ResourceLoaderManager.updateResource(src)
           }}
         />
         {errors?.LOADING_ERROR ||
