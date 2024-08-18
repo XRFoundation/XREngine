@@ -81,7 +81,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const twClassName = twMerge(
-      'flex items-center',
+      'flex items-center justify-center',
       'font-medium text-white',
       'transition ease-in-out',
       'disabled:cursor-not-allowed',
