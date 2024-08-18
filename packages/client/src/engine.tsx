@@ -37,6 +37,7 @@ import { startTimer } from '@etherealengine/spatial/src/startTimer'
 
 import MetaTags from '@etherealengine/client-core/src/common/components/MetaTags'
 import LoadingView from '@etherealengine/ui/src/primitives/tailwind/LoadingView'
+import useGoogleAnalytics from './hooks/useGoogleAnalytics'
 import { initializei18n } from './util'
 
 const initializeLogs = async () => {
@@ -56,6 +57,7 @@ initializeLogs()
 
 export default function ({ children }): JSX.Element {
   const { t } = useTranslation()
+  useGoogleAnalytics()
 
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(window.location.search)

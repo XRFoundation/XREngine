@@ -68,11 +68,29 @@ function pushToEngine(): void {
     if (cachedData.length > 0) {
       try {
         LogConfig.api.service(logsApiPath).create(cachedData)
+
+        sendToGoogleAnalytics(cachedData)
       } catch (err) {
         console.log(err)
       }
 
       engineCache.flushAll()
+    }
+  }
+}
+
+// Function to send cached data to Google Analytics
+function sendToGoogleAnalytics(data: any): void {
+  // Log to Google Analytics if gtag is available
+  if (typeof window !== 'undefined' && window.gtag) {
+    if (Array.isArray(data)) {
+      data.forEach((item) => {
+        if (item && window.gtag) {
+          window.gtag('event', 'irengine_logs', item)
+        }
+      })
+    } else {
+      window.gtag('event', 'irengine_logs', data)
     }
   }
 }

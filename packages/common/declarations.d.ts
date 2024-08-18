@@ -28,3 +28,8 @@ Ethereal Engine. All Rights Reserved.
 import '@feathersjs/transport-commons'
 
 export interface ServiceTypes {}
+
+declare global {
+  interface Window {  dataLayer?: IArguments[]
+    gtag?: (...args: any[]) => void }
+}
