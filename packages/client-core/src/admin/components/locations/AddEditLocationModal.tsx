@@ -182,7 +182,7 @@ export default function AddEditLocationModal(props: { location?: LocationType; s
   }
 
   return (
-    <div className="relative z-50 max-h-[80vh] w-[50vw] bg-theme-surface-main">
+    <div className="relative z-50 w-[50vw] bg-theme-surface-main">
       <div className="relative rounded-lg shadow">
         <ModalHeader
           onClose={PopoverState.hidePopupover}
