@@ -25,15 +25,10 @@ Ethereal Engine. All Rights Reserved.
 
 import { Object3D } from 'three'
 
-import {
-  getAllComponents,
-  getComponent,
-  hasComponent,
-  serializeComponent
-} from '@etherealengine/ecs/src/ComponentFunctions'
+import { getComponent, hasComponent } from '@etherealengine/ecs/src/ComponentFunctions'
 import { NameComponent } from '@etherealengine/spatial/src/common/NameComponent'
-import { TransformComponent } from '@etherealengine/spatial/src/transform/components/TransformComponent'
 
+import { GLTFNodeState } from '../../../../gltf/GLTFDocumentState'
 import { SourceComponent } from '../../../../scene/components/SourceComponent'
 import { GLTFExporterPlugin } from '../GLTFExporter'
 import { ExporterExtension } from './ExporterExtension'
@@ -46,24 +41,29 @@ export class EEECSExporterExtension extends ExporterExtension implements GLTFExp
     const entity = object.entity
     if (!hasComponent(entity, SourceComponent)) return
     //const gltfLoaded = getComponent(entity, GLTFLoadedComponent)
-    const components = getAllComponents(entity)
+    //const components = getAllComponents(entity)
     if (hasComponent(entity, NameComponent)) {
       nodeDef.name = getComponent(entity, NameComponent)
     }
-    for (const component of components) {
-      if (
-        component === TransformComponent ||
-        component === TransformComponent || //skip transform data as that is stored in the object3d
-        !component.jsonID //skip components that don't have a jsonID
-      )
-        continue
-      const compData = serializeComponent(entity, component)
-      if (!compData) continue
-      const extensionName = component.jsonID
-      nodeDef.extensions = nodeDef.extensions ?? {}
-      nodeDef.extensions[extensionName] = compData
-      this.writer.extensionsUsed[extensionName] = true
+    const nodeData = GLTFNodeState.getMutableNode(entity)
+    nodeDef.extensions = JSON.parse(JSON.stringify(nodeData.extensions.value))
+    for (const key in nodeDef.extensions) {
+      this.writer.extensionsUsed[key] = true
     }
+    // for (const component of components) {
+    //   if (
+    //     component === TransformComponent ||
+    //     component === TransformComponent || //skip transform data as that is stored in the object3d
+    //     !component.jsonID //skip components that don't have a jsonID
+    //   )
+    //     continue
+    //   const compData = serializeComponent(entity, component)
+    //   if (!compData) continue
+    //   const extensionName = component.jsonID
+    //   nodeDef.extensions = nodeDef.extensions ?? {}
+    //   nodeDef.extensions[extensionName] = compData
+    //   this.writer.extensionsUsed[extensionName] = true
+    // }
     this.writer.extensionsUsed[this.name] = true
   }
 }
