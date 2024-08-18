@@ -44,6 +44,14 @@ const Engine = lazy(() => import('./engine'))
 const AppPage = lazy(() => import('./pages/AppPage'))
 const Router = lazy(() => import('./route/CustomRouter'))
 
+const projectsToImport = ['default-project']
+
+for (const project of projectsToImport) {
+  import(project).then((module) => {
+    console.log(`${project} loaded`, module)
+  })
+}
+
 const App = () => {
   return (
     <ErrorBoundary>

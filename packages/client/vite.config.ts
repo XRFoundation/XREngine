@@ -35,11 +35,13 @@ import { ViteEjsPlugin } from 'vite-plugin-ejs'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import svgr from 'vite-plugin-svgr'
 
+import appRootPath from 'app-root-path'
 import manifest from './manifest.default.json'
 import packageJson from './package.json'
 import PWA from './pwa.config'
 import { getClientSetting } from './scripts/getClientSettings'
 import { getCoilSetting } from './scripts/getCoilSettings'
+import importMap from './scripts/viteImportMaps'
 
 const { isArray, mergeWith } = lodash
 
@@ -323,6 +325,9 @@ export default defineConfig(async () => {
       }),
       viteCommonjs({
         include: ['use-sync-external-store']
+      }),
+      importMap(isDevOrLocal ? 'development' : 'production', {
+        'default-project': path.resolve(appRootPath.path, 'packages/projects/projects/default-project/src/index.ts')
       })
     ].filter(Boolean),
     resolve: {
