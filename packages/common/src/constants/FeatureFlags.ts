@@ -47,7 +47,8 @@ export const FeatureFlags = {
       TransformPivot: 'ir.editor.ui.transformPivot',
       Hierarchy: {
         ShowModelChildren: 'ir.editor.ui.hierarchy.showModelChildren'
-      }
+      },
+      PointClick: 'ir.editor.ui.pointClick'
     }
   }
 }

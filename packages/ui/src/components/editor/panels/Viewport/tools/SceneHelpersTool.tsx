@@ -23,8 +23,10 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
+import { FeatureFlags } from '@etherealengine/common/src/constants/FeatureFlags'
 import { downloadScreenshot } from '@etherealengine/editor/src/functions/takeScreenshot'
 import { EditorHelperState, PlacementMode } from '@etherealengine/editor/src/services/EditorHelperState'
+import useFeatureFlags from '@etherealengine/engine/src/useFeatureFlags'
 import { useMutableState } from '@etherealengine/hyperflux'
 import { RendererState } from '@etherealengine/spatial/src/renderer/RendererState'
 import React from 'react'
@@ -41,17 +43,20 @@ export default function SceneHelpersTool() {
   const { t } = useTranslation()
   const editorHelperState = useMutableState(EditorHelperState)
   const rendererState = useMutableState(RendererState)
+  const [pointClickEnabled] = useFeatureFlags([FeatureFlags.Studio.UI.PointClick])
 
   return (
     <div className="flex items-center gap-1">
-      <Tooltip content={t('editor:toolbar.placement.click')}>
-        <Button
-          startIcon={<LuMousePointerClick className="text-theme-input" />}
-          onClick={() => editorHelperState.placementMode.set(PlacementMode.CLICK)}
-          variant={editorHelperState.placementMode.value === PlacementMode.CLICK ? 'outline' : 'transparent'}
-          className="px-0"
-        />
-      </Tooltip>
+      {pointClickEnabled && (
+        <Tooltip content={t('editor:toolbar.placement.click')}>
+          <Button
+            startIcon={<LuMousePointerClick className="text-theme-input" />}
+            onClick={() => editorHelperState.placementMode.set(PlacementMode.CLICK)}
+            variant={editorHelperState.placementMode.value === PlacementMode.CLICK ? 'outline' : 'transparent'}
+            className="px-0"
+          />
+        </Tooltip>
+      )}
       <Tooltip content={t('editor:toolbar.placement.drag')}>
         <Button
           startIcon={<LuMove3D className="text-theme-input" />}
