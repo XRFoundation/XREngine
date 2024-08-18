@@ -51,6 +51,7 @@ import {
   updateMaterialPrototype
 } from '@etherealengine/spatial/src/renderer/materials/materialFunctions'
 
+import { defineState, getState, useImmediateEffect } from '@etherealengine/hyperflux'
 import { MeshComponent } from '@etherealengine/spatial/src/renderer/components/MeshComponent'
 import {
   MaterialInstanceComponent,
@@ -61,7 +62,7 @@ import { Material, MeshBasicMaterial } from 'three'
 import { SourceComponent } from '../../components/SourceComponent'
 
 const reactor = (): ReactElement => {
-  useEffect(() => {
+  useImmediateEffect(() => {
     MaterialPrototypeDefinitions.map((prototype: MaterialPrototypeDefinition, uuid) =>
       createMaterialPrototype(prototype)
     )
@@ -90,12 +91,13 @@ const MeshReactor = () => {
     if (source) setComponent(materialEntity, SourceComponent, source)
   }
 
-  useEffect(() => {
+  useImmediateEffect(() => {
     if (materialComponent) return
     const material = meshComponent.material.value as Material
     if (!isArray(material)) createAndSourceMaterial(material)
     else for (const mat of material) createAndSourceMaterial(mat)
   }, [])
+
   return null
 }
 
@@ -135,8 +137,16 @@ const MaterialInstanceReactor = () => {
   return null
 }
 
+export const MaterialLibraryReactorState = defineState({
+  name: 'ee.engine.scene.MaterialLibrarySystem',
+  initial: () => false,
+  reactor
+})
+
 export const MaterialLibrarySystem = defineSystem({
   uuid: 'ee.engine.scene.MaterialLibrarySystem',
   insert: { after: PresentationSystemGroup },
-  reactor
+  execute: () => {
+    getState(MaterialLibraryReactorState)
+  }
 })

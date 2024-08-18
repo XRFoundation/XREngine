@@ -114,6 +114,12 @@
             "type": "node-terminal",
         },
         {
+            "command": "cd packages/network && npm run test",
+            "name": "npm run test - network",
+            "request": "launch",
+            "type": "node-terminal",
+        },
+        {
             "command": "cd packages/engine && npm run test",
             "name": "npm run test - engine",
             "request": "launch",
