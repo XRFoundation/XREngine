@@ -42,6 +42,9 @@ const DEFAULT_INTERVAL_SECONDS = 1800
 const configInterval = parseInt(config.taskserver.processInterval)
 const interval = (configInterval || DEFAULT_INTERVAL_SECONDS) * 1000
 
+let lastTimestamp: string
+let analyticsData: any[] = []
+const collectedData: any[] = []
 export default (app): void => {
   setInterval(async () => {
     logger.info('Collecting analytics at %s.', new Date().toString())
@@ -53,6 +56,25 @@ export default (app): void => {
     })) as ChannelType[]
 
     const knexClient: Knex = app.get('knexClient')
+    const currentTimestamp = new Date().toISOString()
+
+    if (lastTimestamp) {
+      analyticsData = analyticsData.filter((data) => {
+        if (data.timestamp) {
+          return new Date(data.timestamp) > new Date(lastTimestamp)
+        }
+        return false
+      })
+    }
+
+    if (collectedData.length > 0) {
+      // Log the collected events
+      collectedData.forEach((data) => {
+        logger.info(data)
+      })
+    }
+
+    lastTimestamp = currentTimestamp
 
     const instanceUsers = await knexClient
       .from(userPath)
@@ -62,6 +84,12 @@ export default (app): void => {
       .select()
       .options({ nestTables: true })
 
+    for (const user of instanceUsers) {
+      collectedData.push({
+        timestamp: user.updatedAt,
+        user
+      })
+    }
     const channelUsers = await knexClient
       .from(userPath)
       .join(instanceAttendancePath, `${instanceAttendancePath}.userId`, `${userPath}.id`)
@@ -70,6 +98,12 @@ export default (app): void => {
       .select()
       .options({ nestTables: true })
 
+    for (const user of channelUsers) {
+      collectedData.push({
+        timestamp: user.updatedAt,
+        user
+      })
+    }
     const activeInstances = await app.service(instancePath).find({
       query: {
         ended: {
@@ -80,6 +114,10 @@ export default (app): void => {
     })
 
     for (const instance of activeInstances.data) {
+      collectedData.push({
+        timestamp: instance.updatedAt,
+        instance
+      })
       if (instance.location) {
         if (activeLocations.indexOf(instance.location.id) < 0) activeLocations.push(instance.location.id)
         if (activeScenes.indexOf(instance.location.sceneId) < 0) activeScenes.push(instance.location.sceneId)
