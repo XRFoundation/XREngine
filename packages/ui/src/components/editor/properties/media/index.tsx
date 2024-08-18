@@ -49,6 +49,7 @@ import NumericInput from '../../input/Numeric'
 import SelectInput from '../../input/Select'
 import NodeEditor from '../nodeEditor'
 
+const AUDIO_MULTIPLIER = 50
 const PlayModeOptions = [
   {
     label: 'Single',
@@ -99,9 +100,9 @@ export const MediaNodeEditor: EditorComponentType = (props) => {
           min={0}
           max={100}
           step={1}
-          value={media.volume.value}
-          onChange={updateProperty(MediaComponent, 'volume')}
-          onRelease={commitProperty(MediaComponent, 'volume')}
+          value={media.volume.value * AUDIO_MULTIPLIER}
+          onChange={(value) => updateProperty(MediaComponent, 'volume')(value / AUDIO_MULTIPLIER)}
+          onRelease={(value) => commitProperty(MediaComponent, 'volume')(value / AUDIO_MULTIPLIER)}
         />
       </InputGroup>
 
