@@ -83,12 +83,12 @@ export default {
     all: [schemaHooks.resolveExternal(scopeExternalResolver), schemaHooks.resolveResult(scopeResolver)]
   },
   before: {
-    all: [() => schemaHooks.validateQuery(scopeQueryValidator), schemaHooks.resolveQuery(scopeQueryResolver)],
+    all: [schemaHooks.validateQuery(scopeQueryValidator), schemaHooks.resolveQuery(scopeQueryResolver)],
     find: [iff(isProvider('external'), verifyScopeAllowingSelf('user', 'read')), enableClientPagination()],
     get: [iff(isProvider('external'), verifyScopeAllowingSelf('user', 'read'))],
     create: [
       iff(isProvider('external'), verifyScope('user', 'write'), verifyScope('admin', 'admin')),
-      () => schemaHooks.validateData(scopeDataValidator),
+      schemaHooks.validateData(scopeDataValidator),
       schemaHooks.resolveData(scopeDataResolver),
       checkExistingScopes
     ],

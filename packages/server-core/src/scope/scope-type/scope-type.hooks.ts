@@ -44,12 +44,12 @@ export default {
   },
 
   before: {
-    all: [() => schemaHooks.validateQuery(scopeTypeQueryValidator), schemaHooks.resolveQuery(scopeTypeQueryResolver)],
+    all: [schemaHooks.validateQuery(scopeTypeQueryValidator), schemaHooks.resolveQuery(scopeTypeQueryResolver)],
     find: [iff(isProvider('external'), enableClientPagination())],
     get: [],
     create: [
       disallow('external'),
-      () => schemaHooks.validateData(scopeTypeDataValidator),
+      schemaHooks.validateData(scopeTypeDataValidator),
       schemaHooks.resolveData(scopeTypeDataResolver)
     ],
     update: [disallow()],
