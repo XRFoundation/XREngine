@@ -30,7 +30,7 @@ import { defineComponent, getComponent, hasComponent } from '@etherealengine/ecs
 import { NameComponent } from '../../common/NameComponent'
 
 export const Object3DComponent = defineComponent({
-  name: 'Object3D Component',
+  name: 'Object3DComponent',
   jsonID: 'EE_object3d',
 
   onInit: (entity) => null! as Object3D,

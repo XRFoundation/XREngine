@@ -128,7 +128,7 @@ void main() {
 `
 
 export const InfiniteGridComponent = defineComponent({
-  name: 'Infinite Grid',
+  name: 'InfiniteGridComponent',
   onInit(entity) {
     return {
       size: 1,

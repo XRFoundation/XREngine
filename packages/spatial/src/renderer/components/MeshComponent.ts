@@ -41,7 +41,7 @@ import { BoundingBoxComponent } from '../../transform/components/BoundingBoxComp
 import { addObjectToGroup, removeObjectFromGroup } from './GroupComponent'
 
 export const MeshComponent = defineComponent({
-  name: 'Mesh Component',
+  name: 'MeshComponent',
   jsonID: 'EE_mesh',
 
   onInit: (entity) => null! as Mesh,

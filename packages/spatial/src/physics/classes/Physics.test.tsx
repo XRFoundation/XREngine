@@ -122,6 +122,18 @@ export function assertVecAllApproxNotEq(A, B, elems: number, epsilon = Epsilon) 
   if (elems > 3) assertFloatApproxNotEq(A.w, B.w, epsilon)
 }
 
+export function assertMatrixApproxEq(A, B, epsilon = Epsilon) {
+  for (let id = 0; id < 16; ++id) {
+    assertFloatApproxEq(A.elements[id], B.elements[id], epsilon)
+  }
+}
+
+export function assertMatrixAllApproxNotEq(A, B, epsilon = Epsilon) {
+  for (let id = 0; id < 16; ++id) {
+    assertFloatApproxNotEq(A.elements[id], B.elements[id], epsilon)
+  }
+}
+
 export const boxDynamicConfig = {
   shapeType: ShapeType.Cuboid,
   bodyType: RigidBodyType.Fixed,

@@ -51,20 +51,28 @@ export const ObjectLayerComponents = Array.from({ length: maxBitWidth }, (_, i) 
   })
 })
 
+export const ObjectLayerMaskDefault = 1 << 0 // enable layer 0
+
 export const ObjectLayerMaskComponent = defineComponent({
   name: 'ObjectLayerMaskComponent',
   schema: { mask: Types.i32 },
 
   onInit(entity) {
-    return 1 << 0 // enable layer 0
+    return ObjectLayerMaskDefault // enable layer 0
   },
 
   /**
+   * @description
    * Takes a layer mask as a parameter, not a layer (eg. layer mask with value 256 enables layer 8)
-   * Incorrect usage setComponent(entity, ObjectLayerMaskComponent, ObjectLayers.NodeHelper)
-   * Correct usage setComponent(entity, ObjectLayerMaskComponent, ObjectLayerMasks.NodeHelper)
+   * ```ts
+   * // Incorrect usage
+   * setComponent(entity, ObjectLayerMaskComponent, ObjectLayers.NodeHelper)
+   *
+   * // Correct usage
+   * setComponent(entity, ObjectLayerMaskComponent, ObjectLayerMasks.NodeHelper)
+   * ```
    */
-  onSet(entity, component, mask = 1 << 0) {
+  onSet(entity, component, mask = ObjectLayerMaskDefault) {
     for (let i = 0; i < maxBitWidth; i++) {
       const isSet = (mask & ((1 << i) | 0)) !== 0
       if (isSet) {
