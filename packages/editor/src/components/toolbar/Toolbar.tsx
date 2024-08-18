@@ -27,6 +27,7 @@ import AddEditLocationModal from '@etherealengine/client-core/src/admin/componen
 import { NotificationService } from '@etherealengine/client-core/src/common/services/NotificationService'
 import { PopoverState } from '@etherealengine/client-core/src/common/services/PopoverState'
 import { RouterState } from '@etherealengine/client-core/src/common/services/RouterService'
+import { AuthState } from '@etherealengine/client-core/src/user/services/AuthService'
 import { useProjectPermissions } from '@etherealengine/client-core/src/user/useUserProjectPermission'
 import { useUserHasAccessHook } from '@etherealengine/client-core/src/user/userHasAccess'
 import { locationPath } from '@etherealengine/common/src/schema.type.module'
@@ -48,6 +49,7 @@ import { EditorState } from '../../services/EditorServices'
 import CreateSceneDialog from '../dialogs/CreateScenePanelDialog'
 import ImportSettingsPanel from '../dialogs/ImportSettingsPanelDialog'
 import { SaveNewSceneDialog, SaveSceneDialog } from '../dialogs/SaveSceneDialog'
+import Profile from '../profile/Profile'
 
 const onImportAsset = async () => {
   const { projectName } = getState(EditorState)
@@ -152,49 +154,55 @@ export default function Toolbar() {
   const locationQuery = useFind(locationPath, { query: { sceneId: sceneAssetID.value } })
   const currentLocation = locationQuery.data[0]
 
+  const authState = useMutableState(AuthState)
+  const user = authState.user
+
   return (
     <>
       <div className="flex items-center justify-between bg-theme-primary">
         <div className="flex items-center">
           <div className="ml-3 mr-6 cursor-pointer" onClick={onCloseProject}>
-            <img src="favicon-32x32.png" alt="iR Engine Logo" className={`h-7 w-7 opacity-50`} />
+            <img src="favicon-32x32.png" alt="iR Engine Logo" className="h-7 w-7 opacity-50" />
           </div>
           <Button
-            endIcon={<MdOutlineKeyboardArrowDown size="1em" className="-ml-3 text-[#A3A3A3]" />}
+            endIcon={<MdOutlineKeyboardArrowDown size="1.5em" className="-ml-3 text-[#A3A3A3]" />}
             iconContainerClassName="ml-2 mr-1"
             rounded="none"
             startIcon={<RxHamburgerMenu size={24} className="text-theme-input" />}
             className="-mr-1 border-0 bg-transparent p-0"
             onClick={(event) => {
               anchorPosition.set({ left: event.clientX - 5, top: event.clientY - 2 })
-              anchorEvent.set(event)
+              anchorEvent.set({ ...event, currentTarget: event.currentTarget })
             }}
           />
         </div>
-        {/* TO BE ADDED */}
-        {/* <div className="flex items-center gap-2.5 rounded-full bg-theme-surface-main p-0.5">
-          <div className="rounded-2xl px-2.5">{t('editor:toolbar.lbl-simple')}</div>
-          <div className="rounded-2xl bg-blue-primary px-2.5">{t('editor:toolbar.lbl-advanced')}</div>
-        </div> */}
-        <div className="flex items-center gap-2.5">
-          <span className="text-[#B2B5BD]">{projectName.value}</span>
-          <span>/</span>
-          <span>{sceneName.value}</span>
+
+        <div className="flex flex-grow items-center justify-center">
+          <div className="flex items-center gap-2.5">
+            <span className="text-[#B2B5BD]">{projectName.value}</span>
+            <span>/</span>
+            <span>{sceneName.value}</span>
+          </div>
         </div>
-        {sceneAssetID.value && (
-          <Button
-            rounded="none"
-            disabled={!hasPublishAccess}
-            onClick={() =>
-              PopoverState.showPopupover(
-                <AddEditLocationModal sceneID={sceneAssetID.value} location={currentLocation} />
-              )
-            }
-          >
-            {t('editor:toolbar.lbl-publish')}
-          </Button>
-        )}
+
+        <div className="flex items-center gap-4">
+          <Profile user={user} />
+          {sceneAssetID.value && (
+            <Button
+              rounded="none"
+              disabled={!hasPublishAccess}
+              onClick={() =>
+                PopoverState.showPopupover(
+                  <AddEditLocationModal sceneID={sceneAssetID.value} location={currentLocation} />
+                )
+              }
+            >
+              {t('editor:toolbar.lbl-publish')}
+            </Button>
+          )}
+        </div>
       </div>
+
       <ContextMenu
         anchorEvent={anchorEvent.value as React.MouseEvent<HTMLElement>}
         onClose={() => anchorEvent.set(null)}

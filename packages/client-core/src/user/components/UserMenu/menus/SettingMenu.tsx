@@ -82,7 +82,6 @@ export const ShadowMapResolutionOptions: InputMenuItem[] = [
     value: 4096
   }
 ]
-
 const chromeDesktop = !isMobile && /chrome/i.test(navigator.userAgent)
 
 export type Props = {
@@ -107,14 +106,13 @@ const SettingMenu = ({ isPopover }: Props): JSX.Element => {
   const controlSchemes = Object.entries(AvatarAxesControlScheme)
   const handOptions = ['left', 'right']
   const selectedTab = useHookstate('general')
-
   const clientSettingQuery = useFind(clientSettingPath)
   const clientSettings = clientSettingQuery.data[0]
   const userSettings = selfUser.userSetting.value
-
   const hasAdminAccess = userHasAccess('admin:admin')
   const hasEditorAccess = userHasAccess('editor:write')
   const themeSettings = { ...defaultThemeSettings, ...clientSettings?.themeSettings }
+
   const themeModes = {
     client: userSettings?.themeModes?.client ?? defaultThemeModes.client,
     studio: userSettings?.themeModes?.studio ?? defaultThemeModes.studio,
@@ -124,7 +122,6 @@ const SettingMenu = ({ isPopover }: Props): JSX.Element => {
   const handleChangeUserThemeMode = (event) => {
     if (!userSettings) return
     const { name, value } = event.target
-
     const settings: UserSettingPatch = { themeModes: { ...themeModes, [name]: value } }
     AuthService.updateUserSettings(userSettings.id, settings).then(() =>
       logger.info({
@@ -145,7 +142,6 @@ const SettingMenu = ({ isPopover }: Props): JSX.Element => {
     }
     /** @todo switch handdedness */
   }, [avatarInputState.invertRotationAndMoveSticks])
-
   const handleTabChange = (newValue: string) => {
     selectedTab.set(newValue)
   }
@@ -329,7 +325,6 @@ const SettingMenu = ({ isPopover }: Props): JSX.Element => {
                   alt="Mobile Controls"
                 />
               )}
-
               {xrSupported && (
                 <img
                   className={`${styles.row} ${styles.tutorialImage}`}
@@ -338,7 +333,6 @@ const SettingMenu = ({ isPopover }: Props): JSX.Element => {
                 />
               )}
             </>
-
             {/* Windows-specific Graphics/Performance Optimization Helptext */}
             {windowsPerformanceHelp && (
               <>
