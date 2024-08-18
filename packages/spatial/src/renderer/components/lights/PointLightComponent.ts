@@ -24,7 +24,7 @@ Ethereal Engine. All Rights Reserved.
 */
 
 import { useEffect } from 'react'
-import { Color, PointLight } from 'three'
+import { ColorRepresentation, PointLight } from 'three'
 
 import {
   defineComponent,
@@ -38,6 +38,7 @@ import { useEntityContext } from '@etherealengine/ecs/src/EntityFunctions'
 import { matches, useMutableState } from '@etherealengine/hyperflux'
 
 import { LightHelperComponent } from '../../../common/debug/LightHelperComponent'
+import { matchesColor } from '../../../common/functions/MatchesUtils'
 import { useDisposable } from '../../../resources/resourceHooks'
 import { isMobileXRHeadset } from '../../../xr/XRState'
 import { RendererState } from '../../RendererState'
@@ -50,7 +51,7 @@ export const PointLightComponent = defineComponent({
 
   onInit: (entity) => {
     return {
-      color: new Color(),
+      color: 0xffffff as ColorRepresentation,
       intensity: 1,
       range: 0,
       decay: 2,
@@ -63,8 +64,7 @@ export const PointLightComponent = defineComponent({
 
   onSet: (entity, component, json) => {
     if (!json) return
-    if (matches.object.test(json.color) && json.color.isColor) component.color.set(json.color)
-    if (matches.string.test(json.color) || matches.number.test(json.color)) component.color.value.set(json.color)
+    if (matchesColor.test(json.color)) component.color.set(json.color)
     if (matches.number.test(json.intensity)) component.intensity.set(json.intensity)
     if (matches.number.test(json.range)) component.range.set(json.range)
     if (matches.number.test(json.decay)) component.decay.set(json.decay)

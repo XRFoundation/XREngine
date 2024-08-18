@@ -25,8 +25,9 @@ Ethereal Engine. All Rights Reserved.
 
 import { Object3D } from 'three'
 
-import { defineComponent, getComponent, hasComponent } from '@etherealengine/ecs'
+import { defineComponent, useComponent, useEntityContext, useOptionalComponent } from '@etherealengine/ecs'
 
+import { NO_PROXY, useImmediateEffect } from '@etherealengine/hyperflux'
 import { NameComponent } from '../../common/NameComponent'
 
 export const Object3DComponent = defineComponent({
@@ -36,7 +37,20 @@ export const Object3DComponent = defineComponent({
   onInit: (entity) => null! as Object3D,
   onSet: (entity, component, object3d: Object3D) => {
     if (!object3d || !object3d.isObject3D) throw new Error('Object3DComponent: Invalid object3d')
-    if (hasComponent(entity, NameComponent)) object3d.name = getComponent(entity, NameComponent)
     component.set(object3d)
+  },
+
+  reactor: () => {
+    const entity = useEntityContext()
+    const object3DComponent = useComponent(entity, Object3DComponent)
+    const nameComponent = useOptionalComponent(entity, NameComponent)
+
+    useImmediateEffect(() => {
+      if (!nameComponent) return
+      const object = object3DComponent.get(NO_PROXY) as Object3D
+      object.name = nameComponent.value
+    }, [nameComponent?.value])
+
+    return null
   }
 })

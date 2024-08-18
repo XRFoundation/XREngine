@@ -24,7 +24,7 @@ Ethereal Engine. All Rights Reserved.
 */
 
 import type Hls from 'hls.js'
-import { startTransition, useEffect } from 'react'
+import { startTransition, useEffect, useLayoutEffect } from 'react'
 import { DoubleSide, MeshBasicMaterial, PlaneGeometry, Vector3 } from 'three'
 
 import { isClient } from '@etherealengine/common/src/utils/getEnvironment'
@@ -103,19 +103,26 @@ export const MediaElementComponent = defineComponent({
       component.element.set(json.element as HTMLMediaElement)
   },
 
-  onRemove: (entity, component) => {
-    const element = component.element.get({ noproxy: true }) as HTMLMediaElement
-    component.hls.value?.destroy()
-    component.hls.set(none)
-    const audioNodeGroup = AudioNodeGroups.get(element)
-    if (audioNodeGroup && audioNodeGroup.panner) removePannerNode(audioNodeGroup)
-    AudioNodeGroups.delete(element)
-    element.pause()
-    element.removeAttribute('src')
-    element.load()
-    element.remove()
-    component.element.set(none)
-    component.abortController.value.abort()
+  reactor: () => {
+    const entity = useEntityContext()
+    const mediaElementComponent = useComponent(entity, MediaElementComponent)
+
+    useLayoutEffect(() => {
+      return () => {
+        const element = mediaElementComponent.element.get({ noproxy: true }) as HTMLMediaElement
+        mediaElementComponent.hls.value?.destroy()
+        mediaElementComponent.hls.set(none)
+        const audioNodeGroup = AudioNodeGroups.get(element)
+        if (audioNodeGroup && audioNodeGroup.panner) removePannerNode(audioNodeGroup)
+        AudioNodeGroups.delete(element)
+        element.pause()
+        element.removeAttribute('src')
+        element.load()
+        element.remove()
+        mediaElementComponent.element.set(none)
+        mediaElementComponent.abortController.value.abort()
+      }
+    }, [])
   },
 
   errors: ['MEDIA_ERROR', 'HLS_ERROR']
@@ -154,10 +161,6 @@ export const MediaComponent = defineComponent({
        */
       // autoStartTime: -1
     }
-  },
-
-  onRemove: (entity, component) => {
-    removeComponent(entity, MediaElementComponent)
   },
 
   toJSON: (entity, component) => {
@@ -288,6 +291,10 @@ export function MediaReactor() {
       document.body.removeEventListener('touchend', handleAutoplay)
       renderer.domElement.removeEventListener('pointerup', handleAutoplay)
       renderer.domElement.removeEventListener('touchend', handleAutoplay)
+
+      removeComponent(entity, BoundingBoxComponent)
+      removeComponent(entity, InputComponent)
+      removeComponent(entity, MediaElementComponent)
     }
   }, [])
 

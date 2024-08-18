@@ -24,7 +24,7 @@ Ethereal Engine. All Rights Reserved.
 */
 
 import { useEffect } from 'react'
-import { Color, HemisphereLight } from 'three'
+import { ColorRepresentation, HemisphereLight } from 'three'
 
 import {
   defineComponent,
@@ -37,6 +37,7 @@ import { useEntityContext } from '@etherealengine/ecs/src/EntityFunctions'
 import { matches, useMutableState } from '@etherealengine/hyperflux'
 
 import { LightHelperComponent } from '../../../common/debug/LightHelperComponent'
+import { matchesColor } from '../../../common/functions/MatchesUtils'
 import { useDisposable } from '../../../resources/resourceHooks'
 import { RendererState } from '../../RendererState'
 import { addObjectToGroup, removeObjectFromGroup } from '../GroupComponent'
@@ -48,20 +49,16 @@ export const HemisphereLightComponent = defineComponent({
 
   onInit: (entity) => {
     return {
-      skyColor: new Color(),
-      groundColor: new Color(),
+      skyColor: 0xffffff as ColorRepresentation,
+      groundColor: 0xffffff as ColorRepresentation,
       intensity: 1
     }
   },
 
   onSet: (entity, component, json) => {
     if (!json) return
-    if (matches.object.test(json.skyColor) && json.skyColor.isColor) component.skyColor.set(json.skyColor)
-    if (matches.string.test(json.skyColor) || matches.number.test(json.skyColor))
-      component.skyColor.value.set(json.skyColor)
-    if (matches.object.test(json.groundColor) && json.groundColor.isColor) component.groundColor.set(json.groundColor)
-    if (matches.string.test(json.groundColor) || matches.number.test(json.groundColor))
-      component.groundColor.value.set(json.groundColor)
+    if (matchesColor.test(json.skyColor)) component.skyColor.set(json.skyColor)
+    if (matchesColor.test(json.groundColor)) component.groundColor.set(json.groundColor)
     if (matches.number.test(json.intensity)) component.intensity.set(json.intensity)
   },
 

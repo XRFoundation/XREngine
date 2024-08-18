@@ -108,16 +108,11 @@ export const TransformGizmoVisualComponent = defineComponent({
     }
     return visual
   },
+
   onSet(entity, component, json) {
     if (!json) return
   },
-  onRemove: (entity, component) => {
-    for (const mode in TransformMode) {
-      removeEntity(component.gizmo[mode])
-      removeEntity(component.picker[mode])
-      removeEntity(component.helper[mode])
-    }
-  },
+
   reactor: function (props) {
     const gizmoVisualEntity = useEntityContext()
     const visualComponent = useComponent(gizmoVisualEntity, TransformGizmoVisualComponent)
@@ -179,6 +174,10 @@ export const TransformGizmoVisualComponent = defineComponent({
           cleanupGizmo(pickerObject[mode])
           removeObjectFromGroup(helper[mode], helperObject[mode])
           cleanupGizmo(helperObject[mode])
+
+          removeEntity(gizmo[mode])
+          removeEntity(picker[mode])
+          removeEntity(helper[mode])
         }
       }
     }, [])

@@ -51,14 +51,6 @@ export const GroupComponent = defineComponent({
 
   onInit: (entity: Entity) => {
     return [] as Object3D[]
-  },
-
-  onRemove: (entity, component) => {
-    for (const obj of component.value) {
-      if (obj.parent) {
-        obj.removeFromParent()
-      }
-    }
   }
 })
 

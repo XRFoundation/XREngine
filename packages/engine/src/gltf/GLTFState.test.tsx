@@ -373,8 +373,14 @@ describe('GLTFState', () => {
 
     assert.equal(getComponent(nodeEntity!, VisibleComponent), true)
     assert(getComponent(nodeEntity!, HemisphereLightComponent))
-    assert.equal(getComponent(nodeEntity!, HemisphereLightComponent).skyColor.getHex(), new Color('green').getHex())
-    assert.equal(getComponent(nodeEntity!, HemisphereLightComponent).groundColor.getHex(), new Color('purple').getHex())
+    assert.equal(
+      new Color(getComponent(nodeEntity!, HemisphereLightComponent).skyColor).getHex(),
+      new Color('green').getHex()
+    )
+    assert.equal(
+      new Color(getComponent(nodeEntity!, HemisphereLightComponent).groundColor).getHex(),
+      new Color('purple').getHex()
+    )
     assert.equal(getComponent(nodeEntity!, HemisphereLightComponent).intensity, 0.5)
   })
 

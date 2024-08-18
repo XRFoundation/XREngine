@@ -24,12 +24,13 @@ Ethereal Engine. All Rights Reserved.
 */
 
 import { useEffect } from 'react'
-import { AmbientLight, Color } from 'three'
+import { AmbientLight, ColorRepresentation } from 'three'
 
 import { defineComponent, setComponent, useComponent } from '@etherealengine/ecs/src/ComponentFunctions'
 import { useEntityContext } from '@etherealengine/ecs/src/EntityFunctions'
 import { matches } from '@etherealengine/hyperflux'
 
+import { matchesColor } from '../../../common/functions/MatchesUtils'
 import { useDisposable } from '../../../resources/resourceHooks'
 import { addObjectToGroup, removeObjectFromGroup } from '../GroupComponent'
 import { LightTagComponent } from './LightTagComponent'
@@ -40,16 +41,14 @@ export const AmbientLightComponent = defineComponent({
 
   onInit: (entity) => {
     return {
-      // todo, maybe we want to reference light.color instead of creating a new Color?
-      color: new Color(),
+      color: 0xffffff as ColorRepresentation,
       intensity: 1
     }
   },
 
   onSet: (entity, component, json) => {
     if (!json) return
-    if (matches.object.test(json.color) && json.color.isColor) component.color.set(json.color)
-    if (matches.string.test(json.color)) component.color.value.set(json.color)
+    if (matchesColor.test(json.color)) component.color.set(json.color)
     if (matches.number.test(json.intensity)) component.intensity.set(json.intensity)
   },
 

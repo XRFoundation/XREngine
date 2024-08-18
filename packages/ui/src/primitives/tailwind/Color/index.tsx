@@ -25,13 +25,13 @@ Ethereal Engine. All Rights Reserved.
 import { ColorResult } from '@uiw/color-convert'
 import SketchPicker from '@uiw/react-color-sketch'
 import React from 'react'
-import { Color } from 'three'
+import { Color, ColorRepresentation } from 'three'
 
 import { twMerge } from 'tailwind-merge'
 import Text from '../Text'
 
 interface ColorInputProp {
-  value: Color
+  value: ColorRepresentation
   onChange: (color: Color) => void
   onRelease?: (color: Color) => void
   disabled?: boolean
@@ -50,7 +50,8 @@ export function ColorInput({
   textClassName,
   sketchPickerClassName
 }: ColorInputProp) {
-  const hexColor = typeof value.getHexString === 'function' ? '#' + value.getHexString() : '#000'
+  const color = new Color(value)
+  const hexColor = typeof color.getHexString === 'function' ? '#' + color.getHexString() : '#000'
 
   const handleChange = (result: ColorResult) => {
     const color = new Color(result.hex)
@@ -78,7 +79,7 @@ export function ColorInput({
           onChange={handleChange}
           disableAlpha={true}
           onPointerLeave={() => {
-            onRelease && onRelease(value)
+            onRelease && onRelease(color)
           }}
         />
       </div>

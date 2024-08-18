@@ -27,9 +27,14 @@ import type { VRMHumanBoneName } from '@pixiv/three-vrm'
 import { useEffect } from 'react'
 
 import { Engine, UndefinedEntity } from '@etherealengine/ecs'
-import { defineComponent, setComponent, useOptionalComponent } from '@etherealengine/ecs/src/ComponentFunctions'
+import {
+  defineComponent,
+  setComponent,
+  useComponent,
+  useOptionalComponent
+} from '@etherealengine/ecs/src/ComponentFunctions'
 import { useEntityContext } from '@etherealengine/ecs/src/EntityFunctions'
-import { getState, matches } from '@etherealengine/hyperflux'
+import { NO_PROXY, getState, matches, useImmediateEffect } from '@etherealengine/hyperflux'
 
 import { EntityTreeComponent } from '../transform/components/EntityTree'
 import { TransformComponent } from '../transform/components/TransformComponent'
@@ -285,12 +290,21 @@ export const XRAnchorComponent = defineComponent({
       anchor: XRAnchor
     }
   ) => {
-    component.anchor.value?.delete()
     component.anchor.set(data.anchor)
   },
 
-  onRemove: (entity, component) => {
-    component.anchor.value.delete()
+  reactor: () => {
+    const entity = useEntityContext()
+    const xrAnchorComponent = useComponent(entity, XRAnchorComponent)
+
+    useImmediateEffect(() => {
+      const anchor = xrAnchorComponent.anchor.get(NO_PROXY)
+      return () => {
+        anchor?.delete()
+      }
+    }, [xrAnchorComponent.anchor])
+
+    return null
   }
 })
 
@@ -307,18 +321,28 @@ export const XRSpaceComponent = defineComponent({
   onSet: (entity, component, args: { space: XRSpace; baseSpace: XRSpace }) => {
     component.space.set(args.space)
     component.baseSpace.set(args.baseSpace)
+  },
 
-    let parentEntity = UndefinedEntity
-    switch (args.baseSpace) {
-      case ReferenceSpace.localFloor:
-        parentEntity = Engine.instance.localFloorEntity
-        break
-      case ReferenceSpace.viewer:
-        parentEntity = Engine.instance.cameraEntity
-        break
-    }
+  reactor: () => {
+    const entity = useEntityContext()
+    const xrSpaceComponent = useComponent(entity, XRSpaceComponent)
 
-    setComponent(entity, EntityTreeComponent, { parentEntity })
-    setComponent(entity, TransformComponent)
+    useImmediateEffect(() => {
+      const baseSpace = xrSpaceComponent.baseSpace.value
+      let parentEntity = UndefinedEntity
+      switch (baseSpace) {
+        case ReferenceSpace.localFloor:
+          parentEntity = Engine.instance.localFloorEntity
+          break
+        case ReferenceSpace.viewer:
+          parentEntity = Engine.instance.cameraEntity
+          break
+      }
+
+      setComponent(entity, EntityTreeComponent, { parentEntity })
+      setComponent(entity, TransformComponent)
+    }, [])
+
+    return null
   }
 })

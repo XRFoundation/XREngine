@@ -121,12 +121,7 @@ export const TransformGizmoControlComponent = defineComponent({
     if (typeof json.showY === 'number') component.showY.set(json.showY)
     if (typeof json.showZ === 'number') component.showZ.set(json.showZ)
   },
-  onRemove: (entity, component) => {
-    component.controlledEntities.set([])
-    component.visualEntity.set(UndefinedEntity)
-    component.planeEntity.set(UndefinedEntity)
-    component.pivotEntity.set(UndefinedEntity)
-  },
+
   reactor: function (props) {
     const gizmoControlEntity = useEntityContext()
     const gizmoControlComponent = useComponent(gizmoControlEntity, TransformGizmoControlComponent)

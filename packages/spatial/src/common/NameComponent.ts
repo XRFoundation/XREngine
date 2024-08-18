@@ -23,9 +23,10 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import { defineComponent } from '@etherealengine/ecs/src/ComponentFunctions'
+import { useEntityContext } from '@etherealengine/ecs'
+import { defineComponent, useComponent } from '@etherealengine/ecs/src/ComponentFunctions'
 import { Entity } from '@etherealengine/ecs/src/Entity'
-import { hookstate, none } from '@etherealengine/hyperflux'
+import { useImmediateEffect } from '@etherealengine/hyperflux'
 
 const entitiesByName = {} as Record<string, Entity[]>
 
@@ -36,30 +37,28 @@ export const NameComponent = defineComponent({
 
   onSet: (entity, component, name?: string) => {
     if (typeof name !== 'string') throw new Error('NameComponent expects a non-empty string')
-    // remove the entity from the previous name state
-    if (component.value && entitiesByName[component.value]) {
-      const index = entitiesByName[component.value].indexOf(entity)
-      NameComponent.entitiesByNameState[component.value][index].set(none)
-      if (!entitiesByName[component.value].length) NameComponent.entitiesByNameState[component.value].set(none)
-    }
-    // set the new name
     component.set(name)
-    // add the entity to the new name state
-    const exists = NameComponent.entitiesByName[name]
-    const entitiesByNameState = NameComponent.entitiesByNameState
-    if (exists) {
-      if (!exists.includes(entity)) entitiesByNameState.merge({ [name]: [...exists, entity] })
-    } else entitiesByNameState.merge({ [name]: [entity] })
   },
 
-  onRemove: (entity, component) => {
-    const name = component.value
-    const namedEntities = NameComponent.entitiesByNameState[name]
-    const isSingleton = namedEntities.length === 1
-    isSingleton && namedEntities.set(none)
-    !isSingleton && namedEntities.set(namedEntities.value.filter((namedEntity) => namedEntity !== entity))
+  reactor: () => {
+    const entity = useEntityContext()
+    const nameComponent = useComponent(entity, NameComponent)
+
+    useImmediateEffect(() => {
+      const name = nameComponent.value
+      if (!entitiesByName[name]) {
+        entitiesByName[name] = []
+      }
+
+      entitiesByName[name].push(entity)
+      return () => {
+        const index = entitiesByName[name].indexOf(entity)
+        entitiesByName[name].splice(index, 1)
+      }
+    }, [nameComponent.value])
+
+    return null
   },
 
-  entitiesByNameState: hookstate(entitiesByName),
   entitiesByName: entitiesByName as Readonly<typeof entitiesByName>
 })

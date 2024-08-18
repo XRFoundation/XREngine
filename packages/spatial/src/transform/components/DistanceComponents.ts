@@ -25,8 +25,10 @@ Ethereal Engine. All Rights Reserved.
 
 import { Types } from 'bitecs'
 
+import { useEntityContext } from '@etherealengine/ecs'
 import { defineComponent } from '@etherealengine/ecs/src/ComponentFunctions'
 import { Entity } from '@etherealengine/ecs/src/Entity'
+import { useLayoutEffect } from 'react'
 
 export const DistanceComponentSchema = { squaredDistance: Types.f32 }
 
@@ -44,9 +46,14 @@ export const FrustumCullCameraComponent = defineComponent({
   name: 'FrustumCullCameraComponent',
   schema: FrustumCullCameraSchema,
 
-  onRemove(entity, component) {
-    // reset upon removing the component
-    FrustumCullCameraComponent.isCulled[entity] = 0
+  reactor: () => {
+    const entity = useEntityContext()
+    useLayoutEffect(() => {
+      return () => {
+        // reset upon removing the component
+        FrustumCullCameraComponent.isCulled[entity] = 0
+      }
+    }, [])
   }
 })
 

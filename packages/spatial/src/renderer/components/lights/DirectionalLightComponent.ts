@@ -34,7 +34,7 @@ import {
   useOptionalComponent
 } from '@etherealengine/ecs/src/ComponentFunctions'
 import { useEntityContext } from '@etherealengine/ecs/src/EntityFunctions'
-import { matches, useMutableState } from '@etherealengine/hyperflux'
+import { matches, useImmediateEffect, useMutableState } from '@etherealengine/hyperflux'
 
 import { mergeBufferGeometries } from '../../../common/classes/BufferGeometryUtils'
 import { useDisposable } from '../../../resources/resourceHooks'
@@ -147,7 +147,7 @@ export const DirectionalLightComponent = defineComponent({
     const [light] = useDisposable(DirectionalLight, entity)
     const lightHelper = useOptionalComponent(entity, LineSegmentComponent)
 
-    useEffect(() => {
+    useImmediateEffect(() => {
       setComponent(entity, LightTagComponent)
       directionalLightComponent.light.set(light)
       addObjectToGroup(entity, light)

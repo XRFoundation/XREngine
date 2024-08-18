@@ -23,8 +23,10 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import { defineComponent } from '@etherealengine/ecs/src/ComponentFunctions'
+import { useEntityContext } from '@etherealengine/ecs'
+import { defineComponent, useComponent } from '@etherealengine/ecs/src/ComponentFunctions'
 import type { WebContainer3D } from '@etherealengine/xrui'
+import { useLayoutEffect } from 'react'
 
 export const XRUIComponent = defineComponent({
   name: 'XRUIComponent',
@@ -39,7 +41,17 @@ export const XRUIComponent = defineComponent({
     }
   },
 
-  onRemove: (entity, component) => {
-    component.value.destroy()
+  reactor: () => {
+    const entity = useEntityContext()
+    const xruiComponent = useComponent(entity, XRUIComponent)
+
+    useLayoutEffect(() => {
+      const xrui = xruiComponent.value
+      return () => {
+        xrui.destroy()
+      }
+    }, [])
+
+    return null
   }
 })

@@ -23,7 +23,7 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import {
   BufferGeometry,
   Float32BufferAttribute,
@@ -73,12 +73,7 @@ export const PointerComponent = defineComponent({
 
   onSet: (entity, component, json) => {
     if (!json) return
-
     if (matches.object.test(json.inputSource)) component.inputSource.set(json.inputSource)
-  },
-
-  onRemove: (entity, component) => {
-    PointerComponent.pointers.delete(component.inputSource.value as XRInputSource)
   },
 
   reactor: () => {
@@ -97,6 +92,13 @@ export const PointerComponent = defineComponent({
         pointerMaterial.visible = alpha > 0
       }
     })
+
+    useLayoutEffect(() => {
+      const inputSource = pointerComponentState.inputSource.value as XRInputSource
+      return () => {
+        PointerComponent.pointers.delete(inputSource)
+      }
+    }, [])
 
     useEffect(() => {
       const inputSource = pointerComponentState.inputSource.value

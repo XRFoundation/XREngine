@@ -56,7 +56,7 @@ import { Engine } from '@etherealengine/ecs/src/Engine'
 import { Entity, UndefinedEntity } from '@etherealengine/ecs/src/Entity'
 import { createEntity, removeEntity, useEntityContext } from '@etherealengine/ecs/src/EntityFunctions'
 import { useExecute } from '@etherealengine/ecs/src/SystemFunctions'
-import { getMutableState, getState } from '@etherealengine/hyperflux'
+import { getMutableState, getState, useHookstate } from '@etherealengine/hyperflux'
 import { CameraComponent } from '@etherealengine/spatial/src/camera/components/CameraComponent'
 import { ObjectDirection } from '@etherealengine/spatial/src/common/constants/MathConstants'
 import { createTransitionState } from '@etherealengine/spatial/src/common/functions/createTransitionState'
@@ -172,15 +172,8 @@ export const HyperspaceTagComponent = defineComponent({
     return {
       // all internals
       sceneVisible: true,
-      transition: createTransitionState(0.5, 'OUT'),
-      hyperspaceEffectEntity: UndefinedEntity,
-      ambientLightEntity: UndefinedEntity
+      transition: createTransitionState(0.5, 'OUT')
     }
-  },
-
-  onRemove(entity, component) {
-    removeEntity(component.ambientLightEntity.value)
-    destroyEntityTree(component.hyperspaceEffectEntity.value)
   },
 
   reactor: () => {
@@ -189,9 +182,13 @@ export const HyperspaceTagComponent = defineComponent({
       `${config.client.fileServer}/projects/etherealengine/default-project/assets/galaxyTexture.jpg`,
       entity
     )
+    const hyperspaceEffectEntityState = useHookstate(createEntity)
+    const ambientLightEntityState = useHookstate(createEntity)
 
     useEffect(() => {
-      const hyperspaceEffectEntity = createEntity()
+      const hyperspaceEffectEntity = hyperspaceEffectEntityState.value
+      const ambientLightEntity = ambientLightEntityState.value
+
       const hyperspaceEffect = new PortalEffect(hyperspaceEffectEntity)
       addObjectToGroup(hyperspaceEffectEntity, hyperspaceEffect)
       setObjectLayers(hyperspaceEffect, ObjectLayers.Portal)
@@ -200,7 +197,6 @@ export const HyperspaceTagComponent = defineComponent({
       setComponent(hyperspaceEffectEntity, EntityTreeComponent, { parentEntity: entity })
       setComponent(hyperspaceEffectEntity, VisibleComponent)
 
-      const ambientLightEntity = createEntity()
       const light = new AmbientLight('#aaa')
       light.layers.enable(ObjectLayers.Portal)
       addObjectToGroup(ambientLightEntity, light)
@@ -222,14 +218,16 @@ export const HyperspaceTagComponent = defineComponent({
         new Vector3(0, 0, 1).applyQuaternion(cameraTransform.rotation).setY(0).normalize()
       )
 
-      getMutableComponent(entity, HyperspaceTagComponent).hyperspaceEffectEntity.set(hyperspaceEffectEntity)
-      getMutableComponent(entity, HyperspaceTagComponent).ambientLightEntity.set(ambientLightEntity)
+      return () => {
+        removeEntity(ambientLightEntity)
+        destroyEntityTree(hyperspaceEffectEntity)
+      }
     }, [])
 
     useEffect(() => {
       if (!galaxyTexture) return
 
-      const hyperspaceEffectEntity = getComponent(entity, HyperspaceTagComponent).hyperspaceEffectEntity
+      const hyperspaceEffectEntity = hyperspaceEffectEntityState.value
       const hyperspaceEffect = getComponent(hyperspaceEffectEntity, GroupComponent)[0] as any as PortalEffect
       hyperspaceEffect.texture = galaxyTexture
     }, [galaxyTexture])
@@ -238,8 +236,9 @@ export const HyperspaceTagComponent = defineComponent({
       () => {
         if (!hasComponent(entity, HyperspaceTagComponent)) return
 
-        const { transition, hyperspaceEffectEntity } = getComponent(entity, HyperspaceTagComponent)
+        const hyperspaceEffectEntity = hyperspaceEffectEntityState.value
         if (!hyperspaceEffectEntity) return
+        const { transition } = getComponent(entity, HyperspaceTagComponent)
 
         const hyperspaceEffect = getComponent(hyperspaceEffectEntity, GroupComponent)[0] as any as PortalEffect
         const cameraTransform = getComponent(Engine.instance.cameraEntity, TransformComponent)

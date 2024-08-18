@@ -28,6 +28,7 @@ import { matches } from 'ts-matches'
 import { defineComponent } from '@etherealengine/ecs/src/ComponentFunctions'
 import { Entity } from '@etherealengine/ecs/src/Entity'
 
+import { useImmediateEffect } from '@etherealengine/hyperflux'
 import { TransformComponent } from './TransformComponent'
 
 export const ComputedTransformComponent = defineComponent({
@@ -46,7 +47,12 @@ export const ComputedTransformComponent = defineComponent({
     matches.arrayOf(matches.number).test(json.referenceEntities) &&
       component.referenceEntities.set(json.referenceEntities)
     if (typeof json.computeFunction === 'function') component.merge({ computeFunction: json.computeFunction })
+  },
 
-    TransformComponent.transformsNeedSorting = true
+  reactor: () => {
+    useImmediateEffect(() => {
+      TransformComponent.transformsNeedSorting = true
+    }, [])
+    return null
   }
 })
