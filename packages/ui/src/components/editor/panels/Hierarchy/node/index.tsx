@@ -295,7 +295,7 @@ export const HierarchyTreeNode = (props: HierarchyTreeNodeProps) => {
         .map((c) => getState(ComponentEditorsState)[c.name]?.iconComponent)
         .filter((icon) => !!icon)
     : []
-  const IconComponent = icons.length ? icons[icons.length - 1] : TransformPropertyGroup.iconComponent
+  const IconComponent = icons.length > 0 ? icons[0] : TransformPropertyGroup.iconComponent
   const renaming = data.renamingNode && data.renamingNode.entity === node.entity
 
   return (

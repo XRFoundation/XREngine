@@ -5,15 +5,13 @@
   },
   "scenes": [
     {
-      "nodes": [
-        0
-      ]
+      "nodes": [0]
     }
   ],
   "scene": 0,
   "nodes": [
     {
-      "name": "New Object",
+      "name": "Image",
       "extensions": {
         "EE_uuid": "0db4cf3f-8adb-42eb-8efa-3102182e61fc",
         "EE_visible": true,
@@ -27,10 +25,5 @@
       }
     }
   ],
-  "extensionsUsed": [
-    "EE_uuid",
-    "EE_visible",
-    "EE_image",
-    "EE_ecs"
-  ]
+  "extensionsUsed": ["EE_uuid", "EE_visible", "EE_image", "EE_ecs"]
 }
