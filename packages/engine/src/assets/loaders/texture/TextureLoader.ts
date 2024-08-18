@@ -24,50 +24,64 @@ Ethereal Engine. All Rights Reserved.
 */
 
 import { isClient } from '@etherealengine/common/src/utils/getEnvironment'
+import { PromiseQueue } from '@etherealengine/common/src/utils/promiseQueue'
 import { iOS } from '@etherealengine/spatial/src/common/functions/isMobile'
 import { ImageLoader, LoadingManager, Texture } from 'three'
 import { Loader } from '../base/Loader'
 
 const iOSMaxResolution = 1024
 
+const decodeQueue = new PromiseQueue<[string | undefined, HTMLCanvasElement | undefined]>(4)
+
 /** @todo make this accessible for performance scaling */
-const getScaledTextureURI = async (src: string, maxResolution: number): Promise<[string, HTMLCanvasElement]> => {
-  return new Promise(async (resolve) => {
-    const img = new Image()
-    img.crossOrigin = 'anonymous' //browser will yell without this
-    img.src = src
-    await img.decode() //new way to wait for image to load
-    // Initialize the canvas and it's size
-    const canvas = document.createElement('canvas') //dead dom elements? Remove after Three loads them
-    const ctx = canvas.getContext('2d')
+const getScaledTextureURI = async (
+  src: string,
+  maxResolution: number
+): Promise<[string | undefined, HTMLCanvasElement | undefined]> => {
+  return decodeQueue.enqueuePromise(() => {
+    return new Promise(async (resolve) => {
+      // Initialize the canvas
+      const canvas = document.createElement('canvas') //dead dom elements? Remove after Three loads them
+      const ctx = canvas.getContext('2d')
+      try {
+        const img = new Image()
+        img.crossOrigin = 'anonymous' //browser will yell without this
+        img.src = src
+        await img.decode() //new way to wait for image to load
 
-    // Set width and height
-    const originalWidth = img.width
-    const originalHeight = img.height
+        // Set width and height
+        const originalWidth = img.width
+        const originalHeight = img.height
 
-    let resizingFactor = 1
-    if (originalWidth >= originalHeight) {
-      if (originalWidth > maxResolution) {
-        resizingFactor = maxResolution / originalWidth
+        let resizingFactor = 1
+        if (originalWidth >= originalHeight) {
+          if (originalWidth > maxResolution) {
+            resizingFactor = maxResolution / originalWidth
+          }
+        } else {
+          if (originalHeight > maxResolution) {
+            resizingFactor = maxResolution / originalHeight
+          }
+        }
+
+        const canvasWidth = originalWidth * resizingFactor
+        const canvasHeight = originalHeight * resizingFactor
+
+        canvas.width = canvasWidth
+        canvas.height = canvasHeight
+
+        // Draw image and export to a data-uri
+        ctx?.drawImage(img, 0, 0, canvasWidth, canvasHeight)
+        const dataURI = canvas.toDataURL()
+
+        // Do something with the result, like overwrite original
+        resolve([dataURI, canvas])
+      } catch (e) {
+        console.error(e, src)
+        canvas.remove()
+        resolve([undefined, undefined])
       }
-    } else {
-      if (originalHeight > maxResolution) {
-        resizingFactor = maxResolution / originalHeight
-      }
-    }
-
-    const canvasWidth = originalWidth * resizingFactor
-    const canvasHeight = originalHeight * resizingFactor
-
-    canvas.width = canvasWidth
-    canvas.height = canvasHeight
-
-    // Draw image and export to a data-uri
-    ctx?.drawImage(img, 0, 0, canvasWidth, canvasHeight)
-    const dataURI = canvas.toDataURL()
-
-    // Do something with the result, like overwrite original
-    resolve([dataURI, canvas])
+    })
   })
 }
 
@@ -89,7 +103,9 @@ class TextureLoader extends Loader<Texture> {
   ) {
     let canvas: HTMLCanvasElement | undefined = undefined
     if (this.maxResolution) {
-      ;[url, canvas] = await getScaledTextureURI(url, this.maxResolution)
+      const [dataURI, c] = await getScaledTextureURI(url, this.maxResolution)
+      canvas = c
+      if (dataURI) url = dataURI
     }
 
     const texture = new Texture()
@@ -108,7 +124,9 @@ class TextureLoader extends Loader<Texture> {
         onLoad(texture)
       },
       onProgress,
-      onError
+      (err) => {
+        onError?.(err)
+      }
     )
   }
 }

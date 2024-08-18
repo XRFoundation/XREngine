@@ -64,7 +64,6 @@ import {
   SkinnedMesh,
   SRGBColorSpace,
   Texture,
-  TextureLoader,
   TriangleFanDrawMode,
   TriangleStripDrawMode,
   Vector2,
@@ -74,6 +73,7 @@ import {
 import { toTrianglesDrawMode } from '@etherealengine/spatial/src/common/classes/BufferGeometryUtils'
 
 import { FileLoader } from '../base/FileLoader'
+import { TextureLoader } from '../texture/TextureLoader'
 import {
   ALPHA_MODES,
   INTERPOLATION,

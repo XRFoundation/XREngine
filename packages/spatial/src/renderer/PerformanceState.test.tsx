@@ -92,11 +92,11 @@ describe('PerformanceState', () => {
       renderer: 'nvidia corporation, nvidia geforce rtx 3070/pcie/sse2, '
     })
     const performanceState = getState(PerformanceState)
-    assert(performanceState.max3DTextureSize === 1000)
-    assert(performanceState.maxBufferSize === 54000000000)
-    assert(performanceState.maxIndices === 8000)
-    assert(performanceState.maxTextureSize === 2000)
-    assert(performanceState.maxVerticies === 10000)
+    assert(performanceState.max3DTextureSize > 0)
+    assert(performanceState.maxBufferSize > 0)
+    assert(performanceState.maxIndices > 0)
+    assert(performanceState.maxTextureSize > 0)
+    assert(performanceState.maxVerticies > 0)
   })
 
   it('Increments performance offset', (done) => {

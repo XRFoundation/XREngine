@@ -458,7 +458,8 @@ const buildPerformanceState = async (
       window.screen.availHeight *
       window.devicePixelRatio *
       window.devicePixelRatio *
-      gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS),
+      gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) *
+      2,
     maxIndices: gl.getParameter(gl.MAX_ELEMENTS_INDICES) * 2,
     maxVerticies: gl.getParameter(gl.MAX_ELEMENTS_VERTICES) * 2
   })

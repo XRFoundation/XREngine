@@ -23,8 +23,9 @@ All portions of the code written by the Ethereal Engine team are Copyright © 20
 Ethereal Engine. All Rights Reserved.
 */
 
-import { LoaderUtils, Texture, TextureLoader } from 'three'
+import { LoaderUtils, Texture } from 'three'
 
+import { TextureLoader } from '../../texture/TextureLoader'
 import { GLTFLoaderPlugin } from '../GLTFLoader'
 import { ImporterExtension } from './ImporterExtension'
 
