@@ -31,6 +31,7 @@ import { EditorState } from '@etherealengine/editor/src/services/EditorServices'
 import { useHookstate, useMutableState } from '@etherealengine/hyperflux'
 import RenameSceneModal from '@etherealengine/ui/src/components/editor/panels/Scenes/modals/RenameScene'
 import ConfirmDialog from '@etherealengine/ui/src/components/tailwind/ConfirmDialog'
+import Tooltip from '@etherealengine/ui/src/primitives/mui/Tooltip'
 import Button from '@etherealengine/ui/src/primitives/tailwind/Button'
 import Text from '@etherealengine/ui/src/primitives/tailwind/Text'
 import { default as React, useEffect, useRef } from 'react'
@@ -107,7 +108,9 @@ export const SceneItem = ({
         <div className="inline-flex w-full flex-col items-start justify-start">
           <div className="space-between flex w-full flex-row">
             <Text component="h3" fontWeight="light" className="leading-6 text-neutral-100">
-              {sceneName}
+              <Tooltip title={sceneName}>
+                <div className="min-w-52 max-w-52 truncate">{sceneName}</div>
+              </Tooltip>
             </Text>
           </div>
           <Text component="h3" fontSize="xs" fontWeight="light" className="h-3.5 w-40 leading-5 text-neutral-100">
